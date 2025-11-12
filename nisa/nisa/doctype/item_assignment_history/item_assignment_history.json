@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-12 20:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "process_type",
+  "assigned_to",
+  "column_break_1",
+  "status",
+  "assigned_date",
+  "expected_date",
+  "received_date",
+  "days_taken",
+  "section_break_remarks",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "process_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Process Type",
+   "options": "\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery",
+   "reqd": 1
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Assigned To",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Assigned",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Assigned\nIn Progress\nCompleted"
+  },
+  {
+   "fieldname": "assigned_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Assigned Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expected_date",
+   "fieldtype": "Date",
+   "label": "Expected Completion Date"
+  },
+  {
+   "fieldname": "received_date",
+   "fieldtype": "Date",
+   "label": "Received/Completed Date"
+  },
+  {
+   "fieldname": "days_taken",
+   "fieldtype": "Int",
+   "label": "Days Taken",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_remarks",
+   "fieldtype": "Section Break",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-12 20:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Nisa",
+ "name": "Item Assignment History",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

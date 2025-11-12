@@ -1,0 +1,245 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:PIT-{sales_order}-{item_code}-{####}",
+ "creation": "2025-11-12 20:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_order_section",
+  "sales_order",
+  "customer",
+  "column_break_sales",
+  "sales_order_delivery_date",
+  "item_details_section",
+  "item_code",
+  "item_name",
+  "column_break_item",
+  "sales_order_item_row",
+  "qty",
+  "current_status_section",
+  "current_process",
+  "current_assignee",
+  "column_break_current",
+  "assigned_date",
+  "required_days",
+  "expected_completion_date",
+  "section_break_status",
+  "overall_status",
+  "is_overdue",
+  "column_break_overdue",
+  "actual_completion_date",
+  "days_overdue",
+  "assignment_history_section",
+  "assignment_history"
+ ],
+ "fields": [
+  {
+   "fieldname": "sales_order_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Order Information"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sales Order",
+   "options": "Sales Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "sales_order.customer",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_sales",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "sales_order.delivery_date",
+   "fieldname": "sales_order_delivery_date",
+   "fieldtype": "Date",
+   "label": "Sales Order Delivery Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_details_section",
+   "fieldtype": "Section Break",
+   "label": "Item Details"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_item",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Enter the row index/name from Sales Order child table if multiple items are same",
+   "fieldname": "sales_order_item_row",
+   "fieldtype": "Data",
+   "label": "Sales Order Item Row Reference"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "Quantity",
+   "precision": "2"
+  },
+  {
+   "fieldname": "current_status_section",
+   "fieldtype": "Section Break",
+   "label": "Current Assignment"
+  },
+  {
+   "fieldname": "current_process",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Current Process",
+   "options": "\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery"
+  },
+  {
+   "fieldname": "current_assignee",
+   "fieldtype": "Link",
+   "label": "Current Assignee",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "column_break_current",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assigned_date",
+   "fieldtype": "Date",
+   "label": "Assigned Date"
+  },
+  {
+   "fieldname": "required_days",
+   "fieldtype": "Int",
+   "label": "Required Days"
+  },
+  {
+   "fieldname": "expected_completion_date",
+   "fieldtype": "Date",
+   "label": "Expected Completion Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_status",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "default": "Not Started",
+   "fieldname": "overall_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Overall Status",
+   "options": "Not Started\nIn Progress\nCompleted\nOverdue"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_overdue",
+   "fieldtype": "Check",
+   "label": "Is Overdue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_overdue",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "actual_completion_date",
+   "fieldtype": "Date",
+   "label": "Actual Completion Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "days_overdue",
+   "fieldtype": "Int",
+   "label": "Days Overdue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "assignment_history_section",
+   "fieldtype": "Section Break",
+   "label": "Assignment History"
+  },
+  {
+   "fieldname": "assignment_history",
+   "fieldtype": "Table",
+   "label": "Assignment History",
+   "options": "Item Assignment History"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-11-12 20:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Nisa",
+ "name": "Production Item Tracking",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
