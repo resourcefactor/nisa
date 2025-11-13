@@ -83,7 +83,17 @@ app_license = "mit"
 # ------------
 
 # before_install = "nisa.install.before_install"
-# after_install = "nisa.install.after_install"
+after_install = "nisa.utils.sync_workspace"
+
+# Fixtures
+# --------
+# Automatically sync Workspace on migrate
+fixtures = [
+	{
+		"doctype": "Workspace",
+		"filters": [["name", "in", ["Nisa"]]]
+	}
+]
 
 # Uninstallation
 # ------------
