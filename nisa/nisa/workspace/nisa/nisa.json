@@ -1,0 +1,84 @@
+{
+ "cards": [
+  {
+   "hidden": 0,
+   "label": "Production Tracking",
+   "links": "[\n {\n  \"dependencies\": \"\",\n  \"description\": \"Track production items through various stages\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Production Item Tracking\",\n  \"link_count\": 0,\n  \"link_to\": \"Production Item Tracking\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"Visual timeline of production progress\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Production Timeline\",\n  \"link_count\": 0,\n  \"link_to\": \"production_timeline\",\n  \"link_type\": \"Page\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n }\n]"
+  },
+  {
+   "hidden": 0,
+   "label": "Reports",
+   "links": "[\n {\n  \"dependencies\": \"\",\n  \"description\": \"View all items that are overdue\",\n  \"hidden\": 0,\n  \"is_query_report\": 1,\n  \"label\": \"Overdue Production Items\",\n  \"link_count\": 0,\n  \"link_to\": \"Overdue Production Items\",\n  \"link_type\": \"Report\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"Analyze worker performance and efficiency\",\n  \"hidden\": 0,\n  \"is_query_report\": 1,\n  \"label\": \"Worker Performance\",\n  \"link_count\": 0,\n  \"link_to\": \"Worker Performance\",\n  \"link_type\": \"Report\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"View completion status of customer orders\",\n  \"hidden\": 0,\n  \"is_query_report\": 1,\n  \"label\": \"Customer Order Status\",\n  \"link_count\": 0,\n  \"link_to\": \"Customer Order Status\",\n  \"link_type\": \"Report\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n }\n]"
+  },
+  {
+   "hidden": 0,
+   "label": "Quick Access",
+   "links": "[\n {\n  \"dependencies\": \"\",\n  \"description\": \"Create new production tracking record\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"New Production Item\",\n  \"link_count\": 0,\n  \"link_to\": \"Production Item Tracking\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"View production timeline\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Timeline View\",\n  \"link_count\": 0,\n  \"link_to\": \"production_timeline\",\n  \"link_type\": \"Page\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"Check overdue items\",\n  \"hidden\": 0,\n  \"is_query_report\": 1,\n  \"label\": \"Overdue Items\",\n  \"link_count\": 0,\n  \"link_to\": \"Overdue Production Items\",\n  \"link_type\": \"Report\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n }\n]"
+  },
+  {
+   "hidden": 0,
+   "label": "Masters & Setup",
+   "links": "[\n {\n  \"dependencies\": \"\",\n  \"description\": \"Manage suppliers and workers\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Supplier\",\n  \"link_count\": 0,\n  \"link_to\": \"Supplier\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"Manage supplier groups\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Supplier Group\",\n  \"link_count\": 0,\n  \"link_to\": \"Supplier Group\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"View sales orders\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Sales Order\",\n  \"link_count\": 0,\n  \"link_to\": \"Sales Order\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n },\n {\n  \"dependencies\": \"\",\n  \"description\": \"Manage customers\",\n  \"hidden\": 0,\n  \"is_query_report\": 0,\n  \"label\": \"Customer\",\n  \"link_count\": 0,\n  \"link_to\": \"Customer\",\n  \"link_type\": \"DocType\",\n  \"onboard\": 0,\n  \"type\": \"Link\"\n }\n]"
+  }
+ ],
+ "category": "Modules",
+ "charts": [],
+ "creation": "2025-11-13 00:00:00.000000",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends": "",
+ "extends_another_page": 0,
+ "hide_custom": 0,
+ "icon": "production",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Nisa",
+ "links": [],
+ "modified": "2025-11-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Nisa",
+ "name": "Nisa",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 15,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "format": "{} Active",
+   "label": "Production Item Tracking",
+   "link_to": "Production Item Tracking",
+   "stats_filter": "{\"overall_status\": [\"!=\", \"Completed\"]}",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "Report",
+   "format": "{} Overdue",
+   "label": "Overdue Items",
+   "link_to": "Overdue Production Items",
+   "stats_filter": "{}",
+   "type": "Report"
+  },
+  {
+   "color": "Green",
+   "label": "Production Timeline",
+   "link_to": "production_timeline",
+   "type": "Page"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "Report",
+   "label": "Worker Performance",
+   "link_to": "Worker Performance",
+   "type": "Report"
+  }
+ ],
+ "title": "Nisa"
+}
