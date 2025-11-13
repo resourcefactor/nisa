@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+import json
 
 
 @frappe.whitelist()
@@ -9,6 +10,10 @@ def get_timeline_data(filters=None):
 	"""
 	Get data for timeline visualization
 	"""
+	# Parse filters if it comes as JSON string
+	if isinstance(filters, str):
+		filters = json.loads(filters) if filters else {}
+
 	if filters is None:
 		filters = {}
 
