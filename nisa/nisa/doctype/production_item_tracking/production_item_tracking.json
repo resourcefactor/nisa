@@ -96,9 +96,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Enter the row index/name from Sales Order child table if multiple items are same",
+   "description": "Unique identifier from Sales Order child table item row",
    "fieldname": "sales_order_item_row",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Sales Order Item Row Reference"
   },
   {

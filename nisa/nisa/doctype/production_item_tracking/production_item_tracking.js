@@ -2,6 +2,17 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Production Item Tracking', {
+	onload: function(frm) {
+		// Set query filter for current_assignee to show only production suppliers
+		frm.set_query('current_assignee', function() {
+			return {
+				filters: {
+					'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer']]
+				}
+			};
+		});
+	},
+
 	refresh: function(frm) {
 		// Add custom buttons based on status
 		if (!frm.is_new()) {
@@ -296,7 +307,7 @@ function show_item_selector(frm) {
 						value: item.item_code,
 						description: item.description,
 						qty: item.qty,
-						idx: item.idx
+						row_name: item.name
 					};
 				});
 
@@ -312,7 +323,7 @@ function show_item_selector(frm) {
 					let selected = item_list.find(i => i.value === values.item);
 					frm.set_value('item_code', selected.value);
 					frm.set_value('qty', selected.qty);
-					frm.set_value('sales_order_item_row', selected.idx);
+					frm.set_value('sales_order_item_row', selected.row_name);
 				}, __('Select Item from Sales Order'));
 			}
 		}

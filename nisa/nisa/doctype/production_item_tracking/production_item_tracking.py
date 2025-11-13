@@ -56,6 +56,9 @@ def assign_to_worker(doc_name, process_type, assignee, required_days, remarks=No
 	"""
 	doc = frappe.get_doc("Production Item Tracking", doc_name)
 
+	# Convert required_days to int (comes as string from form)
+	required_days = int(required_days)
+
 	# Update current assignment
 	doc.current_process = process_type
 	doc.current_assignee = assignee
@@ -135,6 +138,9 @@ def transfer_to_next(doc_name, next_process, next_assignee, required_days, remar
 	Complete current process and assign to next worker in one action
 	"""
 	doc = frappe.get_doc("Production Item Tracking", doc_name)
+
+	# Convert required_days to int (comes as string from form)
+	required_days = int(required_days)
 
 	# Complete current process
 	if doc.assignment_history:
