@@ -13,7 +13,7 @@ frappe.query_reports["Worker Performance"] = {
 			"fieldname": "process_type",
 			"label": __("Process Type"),
 			"fieldtype": "Select",
-			"options": "\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery"
+			"options": "\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery"
 		},
 		{
 			"fieldname": "from_date",

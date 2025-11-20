@@ -23,7 +23,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Process Type",
-   "options": "\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery",
+   "options": "\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery",
    "reqd": 1
   },
   {

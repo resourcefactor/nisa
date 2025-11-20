@@ -99,7 +99,7 @@ function show_assign_dialog(frm) {
 				fieldname: 'process_type',
 				fieldtype: 'Select',
 				label: __('Process Type'),
-				options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
+				options: '\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery',
 				reqd: 1
 			},
 			{
@@ -164,7 +164,7 @@ function show_transfer_dialog(frm) {
 				fieldname: 'next_process',
 				fieldtype: 'Select',
 				label: __('Next Process'),
-				options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
+				options: '\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery',
 				reqd: 1
 			},
 			{
