@@ -171,7 +171,7 @@ class ProductionTimeline {
 	}
 
 	render_timeline_track(item) {
-		let processes = ['Painter', 'Embellisher', 'Tailor', 'Dyer', 'Quality Check', 'Ready for Delivery'];
+		let processes = ['Dyer', 'Painter', 'Embellisher', 'Tailor', 'Quality Check', 'Out for Delivery'];
 		let history_map = {};
 
 		// Create a map of process history
@@ -300,7 +300,7 @@ class ProductionTimeline {
 								fieldname: 'next_process',
 								fieldtype: 'Select',
 								label: __('Next Process'),
-								options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
+								options: '\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery',
 								depends_on: 'eval:doc.action=="Transfer to Next"'
 							},
 							{

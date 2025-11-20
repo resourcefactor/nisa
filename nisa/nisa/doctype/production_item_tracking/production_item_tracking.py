@@ -123,7 +123,7 @@ def complete_process(doc_name, remarks=None):
 			last_entry.remarks = (last_entry.remarks or "") + "\n" + remarks
 
 	# If all processes are complete, mark actual completion
-	if doc.current_process == "Ready for Delivery":
+	if doc.current_process == "Out for Delivery":
 		doc.actual_completion_date = getdate()
 
 	doc.save()

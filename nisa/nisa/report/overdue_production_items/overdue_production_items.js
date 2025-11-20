@@ -19,7 +19,7 @@ frappe.query_reports["Overdue Production Items"] = {
 			"fieldname": "current_process",
 			"label": __("Current Process"),
 			"fieldtype": "Select",
-			"options": "\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery"
+			"options": "\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery"
 		},
 		{
 			"fieldname": "current_assignee",

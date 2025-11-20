@@ -73,7 +73,7 @@ function show_bulk_assign_dialog(items) {
 				fieldname: 'process_type',
 				fieldtype: 'Select',
 				label: __('Process Type'),
-				options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
+				options: '\nDyer\nPainter\nEmbellisher\nTailor\nQuality Check\nOut for Delivery',
 				reqd: 1
 			},
 			{
