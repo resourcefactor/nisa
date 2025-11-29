@@ -2,18 +2,31 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Production Item Tracking', {
-	onload: function(frm) {
+	onload: function (frm) {
 		// Set query filter for current_assignee to show only production suppliers
-		frm.set_query('current_assignee', function() {
+		frm.set_query('current_assignee', function () {
 			return {
 				filters: {
-					'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer']]
+					'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer', 'Delivery Services']]
 				}
 			};
 		});
 	},
 
-	refresh: function(frm) {
+	refresh: function (frm) {
+		// Recalculate overdue status on client side for real-time display
+		if (frm.doc.expected_completion_date && !frm.doc.actual_completion_date) {
+			let today = frappe.datetime.get_today();
+			let expected_date = frm.doc.expected_completion_date;
+
+			if (frappe.datetime.get_day_diff(today, expected_date) > 0) {
+				let days_overdue = frappe.datetime.get_day_diff(today, expected_date);
+				// Update the display without triggering save
+				frm.set_df_property('days_overdue', 'description',
+					`Currently ${days_overdue} days overdue (calculated in real-time)`);
+			}
+		}
+
 		// Add custom buttons based on status
 		if (!frm.is_new()) {
 			add_action_buttons(frm);
@@ -31,22 +44,22 @@ frappe.ui.form.on('Production Item Tracking', {
 		set_field_colors(frm);
 	},
 
-	sales_order: function(frm) {
+	sales_order: function (frm) {
 		// Auto-fetch items from sales order
 		if (frm.doc.sales_order && !frm.doc.item_code) {
 			show_item_selector(frm);
 		}
 	},
 
-	assigned_date: function(frm) {
+	assigned_date: function (frm) {
 		calculate_dates(frm);
 	},
 
-	required_days: function(frm) {
+	required_days: function (frm) {
 		calculate_dates(frm);
 	},
 
-	expected_completion_date: function(frm) {
+	expected_completion_date: function (frm) {
 		if (frm.doc.assigned_date && frm.doc.expected_completion_date && !frm.doc.required_days) {
 			// Calculate required days from dates
 			let days = frappe.datetime.get_day_diff(frm.doc.expected_completion_date, frm.doc.assigned_date);
@@ -61,23 +74,23 @@ function add_action_buttons(frm) {
 
 	if (frm.doc.overall_status !== 'Completed') {
 		// Assign to Worker button
-		frm.add_custom_button(__('Assign to Worker'), function() {
+		frm.add_custom_button(__('Assign to Worker'), function () {
 			show_assign_dialog(frm);
 		}, __('Actions'));
 
 		if (frm.doc.current_assignee) {
 			// Mark Received button
-			frm.add_custom_button(__('Mark Received'), function() {
+			frm.add_custom_button(__('Mark Received'), function () {
 				mark_received(frm);
 			}, __('Actions'));
 
 			// Complete Process button
-			frm.add_custom_button(__('Complete Process'), function() {
+			frm.add_custom_button(__('Complete Process'), function () {
 				complete_process(frm);
 			}, __('Actions'));
 
 			// Transfer to Next button
-			frm.add_custom_button(__('Transfer to Next'), function() {
+			frm.add_custom_button(__('Transfer to Next'), function () {
 				show_transfer_dialog(frm);
 			}, __('Actions'));
 		}
@@ -85,7 +98,7 @@ function add_action_buttons(frm) {
 
 	// Add refresh button for overdue items
 	if (frm.doc.is_overdue) {
-		frm.add_custom_button(__('View All Overdue'), function() {
+		frm.add_custom_button(__('View All Overdue'), function () {
 			frappe.set_route('query-report', 'Overdue Production Items');
 		});
 	}
@@ -108,10 +121,10 @@ function show_assign_dialog(frm) {
 				label: __('Assign To'),
 				options: 'Supplier',
 				reqd: 1,
-				get_query: function() {
+				get_query: function () {
 					return {
 						filters: {
-							'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer']]
+							'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer', 'Delivery Services']]
 						}
 					};
 				}
@@ -130,7 +143,7 @@ function show_assign_dialog(frm) {
 			}
 		],
 		primary_action_label: __('Assign'),
-		primary_action: function(values) {
+		primary_action: function (values) {
 			frappe.call({
 				method: 'nisa.nisa.doctype.production_item_tracking.production_item_tracking.assign_to_worker',
 				args: {
@@ -140,7 +153,7 @@ function show_assign_dialog(frm) {
 					required_days: values.required_days,
 					remarks: values.remarks
 				},
-				callback: function(r) {
+				callback: function (r) {
 					if (r.message && r.message.success) {
 						frappe.show_alert({
 							message: r.message.message,
@@ -173,10 +186,10 @@ function show_transfer_dialog(frm) {
 				label: __('Assign To'),
 				options: 'Supplier',
 				reqd: 1,
-				get_query: function() {
+				get_query: function () {
 					return {
 						filters: {
-							'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer']]
+							'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer', 'Delivery Services']]
 						}
 					};
 				}
@@ -195,7 +208,7 @@ function show_transfer_dialog(frm) {
 			}
 		],
 		primary_action_label: __('Transfer'),
-		primary_action: function(values) {
+		primary_action: function (values) {
 			frappe.call({
 				method: 'nisa.nisa.doctype.production_item_tracking.production_item_tracking.transfer_to_next',
 				args: {
@@ -205,7 +218,7 @@ function show_transfer_dialog(frm) {
 					required_days: values.required_days,
 					remarks: values.remarks
 				},
-				callback: function(r) {
+				callback: function (r) {
 					if (r.message && r.message.success) {
 						frappe.show_alert({
 							message: r.message.message,
@@ -226,14 +239,14 @@ function mark_received(frm) {
 		label: __('Remarks'),
 		fieldtype: 'Small Text',
 		fieldname: 'remarks'
-	}, function(values) {
+	}, function (values) {
 		frappe.call({
 			method: 'nisa.nisa.doctype.production_item_tracking.production_item_tracking.mark_received',
 			args: {
 				doc_name: frm.doc.name,
 				remarks: values.remarks
 			},
-			callback: function(r) {
+			callback: function (r) {
 				if (r.message && r.message.success) {
 					frappe.show_alert({
 						message: r.message.message,
@@ -251,14 +264,14 @@ function complete_process(frm) {
 		label: __('Remarks'),
 		fieldtype: 'Small Text',
 		fieldname: 'remarks'
-	}, function(values) {
+	}, function (values) {
 		frappe.call({
 			method: 'nisa.nisa.doctype.production_item_tracking.production_item_tracking.complete_process',
 			args: {
 				doc_name: frm.doc.name,
 				remarks: values.remarks
 			},
-			callback: function(r) {
+			callback: function (r) {
 				if (r.message && r.message.success) {
 					frappe.show_alert({
 						message: r.message.message,
@@ -298,7 +311,7 @@ function show_item_selector(frm) {
 			doctype: 'Sales Order',
 			name: frm.doc.sales_order
 		},
-		callback: function(r) {
+		callback: function (r) {
 			if (r.message && r.message.items) {
 				let items = r.message.items;
 				let item_list = items.map(item => {
@@ -319,7 +332,7 @@ function show_item_selector(frm) {
 						options: item_list.map(i => i.value),
 						reqd: 1
 					}
-				], function(values) {
+				], function (values) {
 					let selected = item_list.find(i => i.value === values.item);
 					frm.set_value('item_code', selected.value);
 					frm.set_value('qty', selected.qty);

@@ -88,8 +88,11 @@ def get_columns():
 
 
 def get_data(filters):
+	from frappe.utils import getdate, date_diff
+	
 	conditions = get_conditions(filters)
 
+	# Fetch data - note we're still selecting days_overdue for filtering, but will recalculate
 	data = frappe.db.sql("""
 		SELECT
 			name,
@@ -101,20 +104,33 @@ def get_data(filters):
 			current_assignee,
 			assigned_date,
 			expected_completion_date,
-			days_overdue,
 			sales_order_delivery_date
 		FROM
 			`tabProduction Item Tracking`
 		WHERE
-			is_overdue = 1
-			AND actual_completion_date IS NULL
+			actual_completion_date IS NULL
+			AND expected_completion_date IS NOT NULL
 			{conditions}
 		ORDER BY
-			days_overdue DESC,
-			sales_order_delivery_date ASC
+			expected_completion_date ASC
 	""".format(conditions=conditions), filters, as_dict=1)
-
-	return data
+	
+	# Calculate days_overdue dynamically for each row
+	today = getdate()
+	overdue_items = []
+	
+	for row in data:
+		if row.expected_completion_date:
+			expected_date = getdate(row.expected_completion_date)
+			# Only include items that are actually overdue
+			if today > expected_date:
+				row['days_overdue'] = date_diff(today, expected_date)
+				overdue_items.append(row)
+	
+	# Sort by days_overdue descending, then by SO delivery date
+	overdue_items.sort(key=lambda x: (-x['days_overdue'], x.get('sales_order_delivery_date') or '9999-12-31'))
+	
+	return overdue_items
 
 
 def get_conditions(filters):

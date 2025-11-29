@@ -7,6 +7,11 @@ from frappe.utils import getdate, add_days, date_diff
 
 
 class ProductionItemTracking(Document):
+	def onload(self):
+		"""Recalculate overdue status on document load for real-time accuracy"""
+		self.calculate_overdue_status()
+		self.update_overall_status()
+	
 	def before_save(self):
 		"""Auto-calculate dates and overdue status before saving"""
 		self.calculate_expected_completion_date()
@@ -211,3 +216,90 @@ def bulk_assign(item_names, process_type, assignee, required_days, remarks=None)
 			results.append({"name": item_name, "success": False, "error": str(e)})
 
 	return results
+
+
+def update_all_overdue_status():
+	"""
+	Scheduled function to update overdue status for all incomplete Production Item Tracking records.
+	This runs daily at 1:00 AM to keep the database synchronized.
+	Called from hooks.py scheduler_events.
+	Updates database directly without creating activity logs.
+	"""
+	from frappe.utils import getdate, date_diff
+	
+	frappe.logger().info("Starting daily overdue status update for Production Item Tracking")
+	
+	# Get all incomplete records with expected completion dates
+	items = frappe.get_all(
+		"Production Item Tracking",
+		filters={
+			"actual_completion_date": ["is", "not set"]
+		},
+		fields=["name", "expected_completion_date"],
+		limit_page_length=0
+	)
+	
+	if not items:
+		frappe.logger().info("No incomplete items found to update")
+		return
+	
+	updated_count = 0
+	error_count = 0
+	today = getdate()
+	
+	for item in items:
+		try:
+			# Calculate overdue status
+			if item.expected_completion_date:
+				expected_date = getdate(item.expected_completion_date)
+				
+				if today > expected_date:
+					# Overdue
+					is_overdue = 1
+					days_overdue = date_diff(today, expected_date)
+					overall_status = "Overdue"
+				else:
+					# Not overdue
+					is_overdue = 0
+					days_overdue = 0
+					# Check if in progress or not started
+					current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
+					overall_status = "In Progress" if current_assignee else "Not Started"
+			else:
+				# No expected date
+				is_overdue = 0
+				days_overdue = 0
+				current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
+				overall_status = "In Progress" if current_assignee else "Not Started"
+			
+			# Update database directly without triggering document events
+			# This avoids creating activity logs and version history
+			frappe.db.set_value(
+				"Production Item Tracking",
+				item.name,
+				{
+					"is_overdue": is_overdue,
+					"days_overdue": days_overdue,
+					"overall_status": overall_status
+				},
+				update_modified=False  # Don't update modified timestamp
+			)
+			
+			updated_count += 1
+			
+			# Commit in batches of 50 to avoid long transactions
+			if updated_count % 50 == 0:
+				frappe.db.commit()
+				
+		except Exception as e:
+			error_count += 1
+			frappe.logger().error(f"Error updating {item.name}: {str(e)}")
+			continue
+	
+	# Final commit
+	frappe.db.commit()
+	
+	frappe.logger().info(
+		f"Completed daily overdue status update: "
+		f"{updated_count} items updated, {error_count} errors"
+	)

@@ -2,9 +2,9 @@
 // For license information, please see license.txt
 
 frappe.listview_settings['Production Item Tracking'] = {
-	add_fields: ['overall_status', 'is_overdue', 'current_process', 'current_assignee', 'days_overdue'],
+	add_fields: ['overall_status', 'is_overdue', 'current_process', 'current_assignee', 'days_overdue', 'expected_completion_date', 'actual_completion_date'],
 
-	get_indicator: function(doc) {
+	get_indicator: function (doc) {
 		if (doc.overall_status === 'Completed') {
 			return [__('Completed'), 'green', 'overall_status,=,Completed'];
 		} else if (doc.overall_status === 'Overdue') {
@@ -17,23 +17,53 @@ frappe.listview_settings['Production Item Tracking'] = {
 	},
 
 	formatters: {
-		current_assignee: function(value, df, doc) {
+		overall_status: function (value, df, doc) {
+			// Calculate real-time status for list view display
+			if (doc.actual_completion_date) {
+				return '<span class="indicator-pill green">Completed</span>';
+			}
+
+			if (doc.expected_completion_date) {
+				let today = frappe.datetime.get_today();
+				let expected_date = doc.expected_completion_date;
+
+				// Check if overdue
+				if (frappe.datetime.get_day_diff(today, expected_date) > 0) {
+					let days = frappe.datetime.get_day_diff(today, expected_date);
+					return `<span class="indicator-pill red" title="${days} days overdue">Overdue</span>`;
+				}
+			}
+
+			if (doc.current_assignee) {
+				return '<span class="indicator-pill blue">In Progress</span>';
+			}
+
+			return '<span class="indicator-pill gray">Not Started</span>';
+		},
+		current_assignee: function (value, df, doc) {
 			if (value && doc.current_process) {
 				return `${value} <span class="text-muted">(${doc.current_process})</span>`;
 			}
 			return value || '-';
 		},
-		days_overdue: function(value, df, doc) {
-			if (doc.is_overdue && value > 0) {
-				return `<span class="text-danger">${value} days</span>`;
+		days_overdue: function (value, df, doc) {
+			// Calculate real-time days overdue for list view
+			if (doc.expected_completion_date && !doc.actual_completion_date) {
+				let today = frappe.datetime.get_today();
+				let expected_date = doc.expected_completion_date;
+
+				if (frappe.datetime.get_day_diff(today, expected_date) > 0) {
+					let days = frappe.datetime.get_day_diff(today, expected_date);
+					return `<span class="text-danger">${days} days</span>`;
+				}
 			}
 			return '-';
 		}
 	},
 
-	onload: function(listview) {
+	onload: function (listview) {
 		// Add bulk actions
-		listview.page.add_inner_button(__('Bulk Assign'), function() {
+		listview.page.add_inner_button(__('Bulk Assign'), function () {
 			let selected = listview.get_checked_items();
 			if (selected.length === 0) {
 				frappe.msgprint(__('Please select items to assign'));
@@ -41,17 +71,6 @@ frappe.listview_settings['Production Item Tracking'] = {
 			}
 			show_bulk_assign_dialog(selected);
 		});
-
-		// Add filter shortcuts
-		listview.page.add_button(__('Show Overdue'), function() {
-			listview.filter_area.clear();
-			listview.filter_area.add([[listview.doctype, 'is_overdue', '=', 1]]);
-		}, 'btn-default btn-sm');
-
-		listview.page.add_button(__('Show In Progress'), function() {
-			listview.filter_area.clear();
-			listview.filter_area.add([[listview.doctype, 'overall_status', '=', 'In Progress']]);
-		}, 'btn-default btn-sm');
 	}
 };
 
@@ -82,7 +101,7 @@ function show_bulk_assign_dialog(items) {
 				label: __('Assign To'),
 				options: 'Supplier',
 				reqd: 1,
-				get_query: function() {
+				get_query: function () {
 					return {
 						filters: {
 							'supplier_group': ['in', ['Painter', 'Embellisher', 'Tailor', 'Dyer']]
@@ -104,7 +123,7 @@ function show_bulk_assign_dialog(items) {
 			}
 		],
 		primary_action_label: __('Assign All'),
-		primary_action: function(values) {
+		primary_action: function (values) {
 			frappe.call({
 				method: 'nisa.nisa.doctype.production_item_tracking.production_item_tracking.bulk_assign',
 				args: {
@@ -114,7 +133,7 @@ function show_bulk_assign_dialog(items) {
 					required_days: values.required_days,
 					remarks: values.remarks
 				},
-				callback: function(r) {
+				callback: function (r) {
 					if (r.message) {
 						let success_count = r.message.filter(i => i.success).length;
 						let failed_count = r.message.filter(i => !i.success).length;

@@ -148,23 +148,14 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"nisa.tasks.all"
-# 	],
-# 	"daily": [
-# 		"nisa.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"nisa.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"nisa.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"nisa.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"cron": {
+		# Run daily at 1:00 AM to update overdue status for all Production Item Tracking records
+		"0 1 * * *": [
+			"nisa.nisa.doctype.production_item_tracking.production_item_tracking.update_all_overdue_status"
+		]
+	}
+}
 
 # Testing
 # -------
