@@ -17,31 +17,43 @@ def run_tests():
         frappe.delete_doc("Supplier", "Test-Supplier-PIT", force=1)
     frappe.db.commit()
 
-    if not frappe.db.exists("Item", "Test-Item-PIT"):
+    item_code = "Test-Item-PIT"
+    item_doc_name = frappe.db.get_value("Item", {"item_code": item_code}, "name")
+
+    if not item_doc_name:
         item = frappe.get_doc({
             "doctype": "Item",
-            "item_code": "Test-Item-PIT",
+            "item_code": item_code,
             "item_name": "Test Item PIT",
             "item_group": "All Item Groups",
             "is_stock_item": 1
         }).insert()
+        item_doc_name = item.name
     
-    if not frappe.db.exists("Customer", "Test-Customer-PIT"):
+    customer_name = "Test Customer PIT"
+    customer_doc_name = frappe.db.get_value("Customer", {"customer_name": customer_name}, "name")
+
+    if not customer_doc_name:
         customer = frappe.get_doc({
             "doctype": "Customer",
-            "customer_name": "Test Customer PIT",
+            "customer_name": customer_name,
             "customer_type": "Individual",
             "customer_group": "Commercial",
             "insta_id": "test_insta"
         }).insert()
+        customer_doc_name = customer.name
+    
+    frappe.db.commit()
+    print(f"Using Customer: {customer_doc_name}")
+    print(f"Using Item: {item_doc_name}")
 
     if not frappe.db.exists("Sales Order", "Test-SO-PIT"):
         so = frappe.get_doc({
             "doctype": "Sales Order",
-            "customer": "Test-Customer-PIT",
+            "customer": customer_doc_name,
             "delivery_date": add_days(getdate(), 10),
             "items": [{
-                "item_code": "Test-Item-PIT",
+                "item_code": item_doc_name,
                 "qty": 10,
                 "delivery_date": add_days(getdate(), 10)
             }]
@@ -71,7 +83,7 @@ def run_tests():
     doc = frappe.get_doc({
         "doctype": "Production Item Tracking",
         "sales_order": so_name,
-        "item_code": "Test-Item-PIT",
+        "item_code": item_doc_name,
         "qty": 1,
         "sales_order_item_row": "row_1"
     }).insert()
@@ -99,10 +111,12 @@ def run_tests():
     doc.save()
     
     # Check report
-    columns, data = execute_report()
-    item_in_report = any(d['name'] == doc.name for d in data)
-    assert not item_in_report, "Item should NOT be in overdue report if Partially Completed"
-    print("Report Exclusion Verified")
+    columns, data = execute_report(filters={})
+    item_row = next((d for d in data if d['name'] == doc.name), None)
+    
+    assert item_row is not None, "Item SHOULD be in overdue report even if Partially Completed"
+    assert item_row['days_overdue'] == 0, f"Days overdue should be 0 for Partially Completed item, got {item_row['days_overdue']}"
+    print("Report Inclusion with 0 Overdue Days Verified")
 
     # 5. Transfer to Next -> In Progress
     transfer_to_next(doc.name, "Dyer", supplier_name, 5, "Transferring")
