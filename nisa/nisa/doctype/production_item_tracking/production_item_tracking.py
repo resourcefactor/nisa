@@ -46,6 +46,8 @@ class ProductionItemTracking(Document):
 		"""Update overall status based on current state"""
 		if self.actual_completion_date:
 			self.overall_status = "Completed"
+		elif self.received_date:
+			self.overall_status = "Partially Completed"
 		elif self.is_overdue:
 			self.overall_status = "Overdue"
 		elif self.current_assignee:
@@ -69,7 +71,9 @@ def assign_to_worker(doc_name, process_type, assignee, required_days, remarks=No
 	doc.current_assignee = assignee
 	doc.assigned_date = getdate()
 	doc.required_days = required_days
+	doc.required_days = required_days
 	doc.actual_completion_date = None
+	doc.received_date = None
 
 	# Add to history
 	doc.append("assignment_history", {
@@ -120,6 +124,8 @@ def complete_process(doc_name, remarks=None):
 		last_entry.status = "Completed"
 		last_entry.received_date = getdate()
 
+		doc.received_date = getdate()
+
 		# Calculate days taken
 		if last_entry.assigned_date:
 			last_entry.days_taken = date_diff(getdate(), last_entry.assigned_date)
@@ -161,7 +167,9 @@ def transfer_to_next(doc_name, next_process, next_assignee, required_days, remar
 	doc.current_assignee = next_assignee
 	doc.assigned_date = getdate()
 	doc.required_days = required_days
+	doc.required_days = required_days
 	doc.actual_completion_date = None
+	doc.received_date = None
 
 	# Add to history
 	doc.append("assignment_history", {
@@ -264,13 +272,21 @@ def update_all_overdue_status():
 					days_overdue = 0
 					# Check if in progress or not started
 					current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
-					overall_status = "In Progress" if current_assignee else "Not Started"
+					received_date = frappe.db.get_value("Production Item Tracking", item.name, "received_date")
+					if received_date:
+						overall_status = "Partially Completed"
+					else:
+						overall_status = "In Progress" if current_assignee else "Not Started"
 			else:
 				# No expected date
 				is_overdue = 0
 				days_overdue = 0
 				current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
-				overall_status = "In Progress" if current_assignee else "Not Started"
+				received_date = frappe.db.get_value("Production Item Tracking", item.name, "received_date")
+				if received_date:
+					overall_status = "Partially Completed"
+				else:
+					overall_status = "In Progress" if current_assignee else "Not Started"
 			
 			# Update database directly without triggering document events
 			# This avoids creating activity logs and version history

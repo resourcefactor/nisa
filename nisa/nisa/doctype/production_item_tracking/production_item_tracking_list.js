@@ -11,6 +11,8 @@ frappe.listview_settings['Production Item Tracking'] = {
 			return [__('Overdue'), 'red', 'overall_status,=,Overdue'];
 		} else if (doc.overall_status === 'In Progress') {
 			return [__('In Progress'), 'blue', 'overall_status,=,In Progress'];
+		} else if (doc.overall_status === 'Partially Completed') {
+			return [__('Partially Completed'), 'orange', 'overall_status,=,Partially Completed'];
 		} else {
 			return [__('Not Started'), 'gray', 'overall_status,=,Not Started'];
 		}
@@ -36,6 +38,10 @@ frappe.listview_settings['Production Item Tracking'] = {
 
 			if (doc.current_assignee) {
 				return '<span class="indicator-pill blue">In Progress</span>';
+			}
+
+			if (doc.overall_status === 'Partially Completed') {
+				return '<span class="indicator-pill orange">Partially Completed</span>';
 			}
 
 			return '<span class="indicator-pill gray">Not Started</span>';

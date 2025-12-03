@@ -117,6 +117,7 @@ def get_data(filters):
 			assignee_name,
 			assigned_date,
 			expected_completion_date,
+			received_date,
 			sales_order_delivery_date
 		FROM
 			`tabProduction Item Tracking`
@@ -133,6 +134,12 @@ def get_data(filters):
 	overdue_items = []
 	
 	for row in data:
+		# If partially completed (received), show with 0 overdue days
+		if row.received_date:
+			row['days_overdue'] = 0
+			overdue_items.append(row)
+			continue
+
 		if row.expected_completion_date:
 			expected_date = getdate(row.expected_completion_date)
 			# Only include items that are actually overdue

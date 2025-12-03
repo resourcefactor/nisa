@@ -149,6 +149,12 @@
    "read_only": 1
   },
   {
+   "fieldname": "received_date",
+   "fieldtype": "Date",
+   "label": "Received Date",
+   "read_only": 1
+  },
+  {
    "fieldname": "section_break_status",
    "fieldtype": "Section Break",
    "label": "Status"
@@ -160,7 +166,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Overall Status",
-   "options": "Not Started\nIn Progress\nCompleted\nOverdue"
+   "options": "Not Started\nIn Progress\nPartially Completed\nCompleted\nOverdue"
   },
   {
    "default": "0",
