@@ -18,7 +18,7 @@ def get_columns():
 			"label": _("ID"),
 			"fieldtype": "Link",
 			"options": "Production Item Tracking",
-			"width": 150
+			"width": 120
 		},
 		{
 			"fieldname": "sales_order",
@@ -32,6 +32,12 @@ def get_columns():
 			"label": _("Customer"),
 			"fieldtype": "Link",
 			"options": "Customer",
+			"width": 120
+		},
+		{
+			"fieldname": "customer_name",
+			"label": _("Customer Name"),
+			"fieldtype": "Data",
 			"width": 150
 		},
 		{
@@ -58,6 +64,12 @@ def get_columns():
 			"label": _("Current Assignee"),
 			"fieldtype": "Link",
 			"options": "Supplier",
+			"width": 120
+		},
+		{
+			"fieldname": "assignee_name",
+			"label": _("Assignee Name"),
+			"fieldtype": "Data",
 			"width": 150
 		},
 		{
@@ -97,11 +109,12 @@ def get_data(filters):
 		SELECT
 			name,
 			sales_order,
-			customer,
+			customer,customer_name,
 			item_code,
 			item_name,
 			current_process,
 			current_assignee,
+			assignee_name,
 			assigned_date,
 			expected_completion_date,
 			sales_order_delivery_date

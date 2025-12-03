@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:PIT-{sales_order}-{item_code}-{####}",
- "creation": "2025-11-12 20:00:00.000000",
+ "creation": "2025-11-12 20:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -11,6 +11,7 @@
   "customer",
   "column_break_sales",
   "sales_order_delivery_date",
+  "customer_name",
   "item_details_section",
   "item_code",
   "item_name",
@@ -20,6 +21,7 @@
   "current_status_section",
   "current_process",
   "current_assignee",
+  "assignee_name",
   "column_break_current",
   "assigned_date",
   "required_days",
@@ -52,7 +54,6 @@
    "fetch_from": "sales_order.customer",
    "fieldname": "customer",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Customer",
    "options": "Customer",
@@ -194,11 +195,25 @@
    "fieldtype": "Table",
    "label": "Assignment History",
    "options": "Item Assignment History"
+  },
+  {
+   "fetch_from": "sales_order.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name"
+  },
+  {
+   "fetch_from": "current_assignee.supplier_name",
+   "fieldname": "assignee_name",
+   "fieldtype": "Data",
+   "label": "Assignee Name",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-12 20:00:00.000000",
+ "modified": "2025-12-03 10:15:00.127212",
  "modified_by": "Administrator",
  "module": "Nisa",
  "name": "Production Item Tracking",
@@ -239,6 +254,7 @@
    "share": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
