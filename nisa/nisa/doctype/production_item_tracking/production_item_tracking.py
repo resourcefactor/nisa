@@ -28,6 +28,12 @@ class ProductionItemTracking(Document):
 
 	def calculate_overdue_status(self):
 		"""Calculate if item is overdue and by how many days"""
+		# If received_date is set (Partially Completed), don't mark as overdue
+		if self.received_date:
+			self.is_overdue = 0
+			self.days_overdue = 0
+			return
+			
 		if self.expected_completion_date and not self.actual_completion_date:
 			today = getdate()
 			expected_date = getdate(self.expected_completion_date)
@@ -257,8 +263,16 @@ def update_all_overdue_status():
 	
 	for item in items:
 		try:
-			# Calculate overdue status
-			if item.expected_completion_date:
+			# First check if received_date is set (Partially Completed)
+			received_date = frappe.db.get_value("Production Item Tracking", item.name, "received_date")
+			
+			if received_date:
+				# Partially Completed items are never overdue
+				is_overdue = 0
+				days_overdue = 0
+				overall_status = "Partially Completed"
+			elif item.expected_completion_date:
+				# Calculate overdue status
 				expected_date = getdate(item.expected_completion_date)
 				
 				if today > expected_date:
@@ -272,21 +286,13 @@ def update_all_overdue_status():
 					days_overdue = 0
 					# Check if in progress or not started
 					current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
-					received_date = frappe.db.get_value("Production Item Tracking", item.name, "received_date")
-					if received_date:
-						overall_status = "Partially Completed"
-					else:
-						overall_status = "In Progress" if current_assignee else "Not Started"
+					overall_status = "In Progress" if current_assignee else "Not Started"
 			else:
 				# No expected date
 				is_overdue = 0
 				days_overdue = 0
 				current_assignee = frappe.db.get_value("Production Item Tracking", item.name, "current_assignee")
-				received_date = frappe.db.get_value("Production Item Tracking", item.name, "received_date")
-				if received_date:
-					overall_status = "Partially Completed"
-				else:
-					overall_status = "In Progress" if current_assignee else "Not Started"
+				overall_status = "In Progress" if current_assignee else "Not Started"
 			
 			# Update database directly without triggering document events
 			# This avoids creating activity logs and version history
