@@ -26,6 +26,12 @@ def get_columns():
 			"label": _("Customer"),
 			"fieldtype": "Link",
 			"options": "Customer",
+			"width": 100
+		},
+  {
+			"fieldname": "customer_name",
+			"label": _("Customer Name"),
+			"fieldtype": "Data",
 			"width": 180
 		},
 		{
@@ -85,7 +91,7 @@ def get_data(filters):
 	data = frappe.db.sql("""
 		SELECT
 			sales_order,
-			customer,
+			customer,customer_name,
 			sales_order_delivery_date as delivery_date,
 			COUNT(*) as total_items,
 			SUM(CASE WHEN overall_status = 'Completed' THEN 1 ELSE 0 END) as completed_items,

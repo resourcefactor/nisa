@@ -24,14 +24,14 @@ def get_columns():
 		{
 			"fieldname": "supplier_code",
 			"label": _("Supplier Code"),
-			"fieldtype": "Data",
+			"fieldtype": "Link",
+			"options": "Supplier",
 			"width": 120
 		},
 		{
 			"fieldname": "supplier_name",
 			"label": _("Supplier Name"),
-			"fieldtype": "Link",
-			"options": "Supplier",
+			"fieldtype": "Data",				
 			"width": 180
 		},
 		{
