@@ -26,11 +26,24 @@ def get_columns():
 			"label": _("Supplier Code"),
 			"fieldtype": "Link",
 			"options": "Supplier",
-			"width": 120
+			"width": 100
 		},
 		{
 			"fieldname": "supplier_name",
 			"label": _("Supplier Name"),
+			"fieldtype": "Data",				
+			"width": 180
+		},
+  {
+			"fieldname": "customer",
+			"label": _("Customer"),
+			"fieldtype": "Link",
+			"options": "Customer",
+			"width": 100
+		},
+		{
+			"fieldname": "customer_name",
+			"label": _("Customer Name"),
 			"fieldtype": "Data",				
 			"width": 180
 		},
@@ -82,6 +95,8 @@ def get_data(filters):
 			pit.sales_order,
 			sup.supplier_name as supplier_code,
 			pit.current_assignee as supplier_name,
+			pit.customer,
+			pit.customer_name,
 			pit.item_code,
 			pit.item_name,
 			pit.qty,
