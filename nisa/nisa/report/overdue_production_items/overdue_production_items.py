@@ -134,10 +134,8 @@ def get_data(filters):
 	overdue_items = []
 	
 	for row in data:
-		# If partially completed (received), show with 0 overdue days
+		# Skip records where received_date is available
 		if row.received_date:
-			row['days_overdue'] = 0
-			overdue_items.append(row)
 			continue
 
 		if row.expected_completion_date:
