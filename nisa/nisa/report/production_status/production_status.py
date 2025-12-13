@@ -108,7 +108,7 @@ def get_data(filters):
 		LEFT JOIN
 			`tabSupplier` sup ON pit.current_assignee = sup.name
 		WHERE
-			1=1
+			pit.received_date is not null and  1=1
 			{conditions}
 		ORDER BY
 			pit.sales_order,
