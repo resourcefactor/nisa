@@ -16,7 +16,7 @@ class ProductionTimeline {
 		this.page = page;
 		this.setup_filters();
 		this.setup_refresh_button();
-		this.load_data();
+		this.show_initial_message();
 	}
 
 	setup_filters() {
@@ -70,6 +70,15 @@ class ProductionTimeline {
 			overall_status: this.page.fields_dict.overall_status.get_value(),
 			current_process: this.page.fields_dict.current_process.get_value()
 		};
+	}
+
+	show_initial_message() {
+		this.page.main.html(`
+			<div class="alert alert-info" style="margin: 20px;">
+				<strong>Welcome to Production Timeline</strong><br>
+				Please select either a <strong>Sales Order</strong> or <strong>Customer</strong> filter to view production timeline data.
+			</div>
+		`);
 	}
 
 	load_data() {
