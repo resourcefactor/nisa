@@ -73,10 +73,22 @@ class ProductionTimeline {
 	}
 
 	load_data() {
+		// Check if at least one mandatory filter (Sales Order or Customer) is provided
+		const filters = this.get_filters();
+
+		if (!filters.sales_order && !filters.customer) {
+			this.page.main.html(`
+				<div class="alert alert-warning" style="margin: 20px;">
+					<strong>Filter Required:</strong> Please select either a Sales Order or Customer to load data.
+				</div>
+			`);
+			return;
+		}
+
 		frappe.call({
 			method: 'nisa.nisa.page.production_timeline.production_timeline.get_timeline_data',
 			args: {
-				filters: this.get_filters()
+				filters: filters
 			},
 			callback: (r) => {
 				if (r.message) {

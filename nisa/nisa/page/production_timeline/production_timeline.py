@@ -17,6 +17,10 @@ def get_timeline_data(filters=None):
 	if filters is None:
 		filters = {}
 
+	# Validate that at least one mandatory filter is provided
+	if not filters.get('customer') and not filters.get('sales_order'):
+		frappe.throw('Please select either a Sales Order or Customer to load data.')
+
 	# Build query conditions
 	conditions = []
 	values = {}
