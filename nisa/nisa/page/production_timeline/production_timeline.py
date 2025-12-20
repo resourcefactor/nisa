@@ -17,9 +17,9 @@ def get_timeline_data(filters=None):
 	if filters is None:
 		filters = {}
 
-	# Validate that at least one mandatory filter is provided
-	if not filters.get('customer') and not filters.get('sales_order'):
-		frappe.throw('Please select either a Sales Order or Customer to load data.')
+	# Validate that at least one filter is provided
+	if not any(filters.values()):
+		frappe.throw('Please select at least one filter to load data.')
 
 	# Build query conditions
 	conditions = []
@@ -49,11 +49,13 @@ def get_timeline_data(filters=None):
 			name,
 			sales_order,
 			customer,
+			customer_name,
 			item_code,
 			item_name,
 			qty,
 			current_process,
 			current_assignee,
+			assignee_name,
 			assigned_date,
 			expected_completion_date,
 			actual_completion_date,
@@ -73,7 +75,15 @@ def get_timeline_data(filters=None):
 		history = frappe.get_all(
 			'Item Assignment History',
 			filters={'parent': item.name},
-			fields=['process_type', 'assigned_to', 'assigned_date', 'received_date', 'status', 'days_taken'],
+			fields=[
+				'process_type',
+				'assigned_to',
+				'assigned_to.supplier_name as supplier_name',
+				'assigned_date',
+				'received_date',
+				'status',
+				'days_taken'
+			],
 			order_by='assigned_date'
 		)
 		item['history'] = history

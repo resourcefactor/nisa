@@ -1,32 +1,49 @@
 // Copyright (c) 2025, RF and contributors
 // For license information, please see license.txt
 
-frappe.pages['production_timeline'].on_page_load = function(wrapper) {
+frappe.pages['production_timeline'].on_page_load = function (wrapper) {
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
 		title: 'Production Timeline',
 		single_column: true
 	});
 
-	frappe.production_timeline = new ProductionTimeline(page);
+	frappe.production_timeline = new ProductionTimeline(wrapper, page);
 };
 
 class ProductionTimeline {
-	constructor(page) {
-		this.page = page;
+	constructor(wrapper, page) {
+		this.page = page || wrapper.page;
+		this.wrapper = wrapper;
+		this.setup_page();
+	}
+
+	setup_page() {
+		// Clear any existing page fields to ensure clean state
+		if (this.page.clear_fields) {
+			this.page.clear_fields();
+		}
+
+		// Create a dedicated container for content to avoid overwriting filters
+		this.$container = $('<div class="production-timeline-content"></div>').appendTo(this.page.main);
+
 		this.setup_filters();
 		this.setup_refresh_button();
 		this.show_initial_message();
 	}
 
 	setup_filters() {
+		let me = this;
+
 		// Customer filter
 		this.page.add_field({
 			fieldname: 'customer',
 			label: __('Customer'),
 			fieldtype: 'Link',
 			options: 'Customer',
-			onchange: () => this.load_data()
+			change: function () {
+				me.load_data();
+			}
 		});
 
 		// Sales Order filter
@@ -35,25 +52,31 @@ class ProductionTimeline {
 			label: __('Sales Order'),
 			fieldtype: 'Link',
 			options: 'Sales Order',
-			onchange: () => this.load_data()
+			change: function () {
+				me.load_data();
+			}
 		});
 
-		// Status filter
+		// Status filter (optional)
 		this.page.add_field({
 			fieldname: 'overall_status',
 			label: __('Status'),
 			fieldtype: 'Select',
 			options: '\nNot Started\nIn Progress\nCompleted\nOverdue',
-			onchange: () => this.load_data()
+			change: function () {
+				me.load_data();
+			}
 		});
 
-		// Process filter
+		// Process filter (optional)
 		this.page.add_field({
 			fieldname: 'current_process',
 			label: __('Current Process'),
 			fieldtype: 'Select',
 			options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
-			onchange: () => this.load_data()
+			change: function () {
+				me.load_data();
+			}
 		});
 	}
 
@@ -73,22 +96,23 @@ class ProductionTimeline {
 	}
 
 	show_initial_message() {
-		this.page.main.html(`
+		this.$container.html(`
 			<div class="alert alert-info" style="margin: 20px;">
 				<strong>Welcome to Production Timeline</strong><br>
-				Please select either a <strong>Sales Order</strong> or <strong>Customer</strong> filter to view production timeline data.
+				Please select any filter to view production timeline data.
 			</div>
 		`);
 	}
 
 	load_data() {
-		// Check if at least one mandatory filter (Sales Order or Customer) is provided
+		// Check if at least one filter is provided
 		const filters = this.get_filters();
+		const has_filter = Object.values(filters).some(value => value);
 
-		if (!filters.sales_order && !filters.customer) {
-			this.page.main.html(`
+		if (!has_filter) {
+			this.$container.html(`
 				<div class="alert alert-warning" style="margin: 20px;">
-					<strong>Filter Required:</strong> Please select either a Sales Order or Customer to load data.
+					<strong>Filter Required:</strong> Please select at least one filter to load data.
 				</div>
 			`);
 			return;
@@ -123,7 +147,7 @@ class ProductionTimeline {
 
 		html += '</div>';
 
-		this.page.main.html(html);
+		this.$container.html(html);
 		this.attach_event_handlers();
 	}
 
@@ -140,11 +164,14 @@ class ProductionTimeline {
 
 	render_sales_order_group(sales_order, items) {
 		let customer = items[0].customer;
+		let customer_name = items[0].customer_name || '';
+		let customer_display = customer_name ? `${customer} (${customer_name})` : customer;
+
 		let html = `
 			<div class="sales-order-group" style="margin-bottom: 30px; border: 1px solid #d1d8dd; border-radius: 5px; padding: 15px; background: #f9fafb;">
 				<h4 style="margin-top: 0;">
 					<a href="/app/sales-order/${sales_order}" target="_blank">${sales_order}</a>
-					<span style="color: #8d99a6; font-size: 14px; margin-left: 10px;">${customer}</span>
+					<span style="color: #8d99a6; font-size: 14px; margin-left: 10px;">${customer_display}</span>
 				</h4>
 		`;
 
@@ -217,11 +244,11 @@ class ProductionTimeline {
 			if (is_completed) {
 				circle_class = 'timeline-circle-completed';
 				circle_color = '#28a745';
-				worker_name = history.assigned_to;
+				worker_name = history.supplier_name || history.assigned_to;
 			} else if (is_in_progress || is_current) {
 				circle_class = 'timeline-circle-current';
 				circle_color = '#007bff';
-				worker_name = item.current_assignee || history.assigned_to;
+				worker_name = item.assignee_name || item.current_assignee || (history ? (history.supplier_name || history.assigned_to) : '');
 			}
 
 			// Draw connecting line (except for first element)
@@ -251,7 +278,7 @@ class ProductionTimeline {
 					<div style="margin-top: 5px; font-size: 11px; font-weight: bold; color: #36414c;">
 						${process}
 					</div>
-					${worker_name ? `<div style="font-size: 10px; color: #8d99a6;">${worker_name}</div>` : ''}
+					${worker_name ? `<div style="font-size: 10px; color: #8d99a6; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 auto;" title="${worker_name}">${worker_name}</div>` : ''}
 					${history && history.days_taken ? `<div style="font-size: 10px; color: #6c757d;">${history.days_taken} days</div>` : ''}
 				</div>
 			`;
@@ -305,7 +332,7 @@ class ProductionTimeline {
 								label: __('Action'),
 								options: '\nMark Received\nComplete Process\nTransfer to Next',
 								reqd: 1,
-								onchange: function() {
+								onchange: function () {
 									let action = d.get_value('action');
 									d.fields_dict.transfer_section.df.hidden = (action !== 'Transfer to Next');
 									d.refresh();
