@@ -26,7 +26,7 @@ class ProductionTimeline {
 			label: __('Customer'),
 			fieldtype: 'Link',
 			options: 'Customer',
-			change: () => this.load_data()
+			onchange: () => this.load_data()
 		});
 
 		// Sales Order filter
@@ -35,7 +35,7 @@ class ProductionTimeline {
 			label: __('Sales Order'),
 			fieldtype: 'Link',
 			options: 'Sales Order',
-			change: () => this.load_data()
+			onchange: () => this.load_data()
 		});
 
 		// Status filter
@@ -44,7 +44,7 @@ class ProductionTimeline {
 			label: __('Status'),
 			fieldtype: 'Select',
 			options: '\nNot Started\nIn Progress\nCompleted\nOverdue',
-			change: () => this.load_data()
+			onchange: () => this.load_data()
 		});
 
 		// Process filter
@@ -53,7 +53,7 @@ class ProductionTimeline {
 			label: __('Current Process'),
 			fieldtype: 'Select',
 			options: '\nPainter\nEmbellisher\nTailor\nDyer\nQuality Check\nReady for Delivery',
-			change: () => this.load_data()
+			onchange: () => this.load_data()
 		});
 	}
 
