@@ -78,6 +78,16 @@ class ProductionTimeline {
 				me.load_data();
 			}
 		});
+
+		// Urgent filter
+		this.page.add_field({
+			fieldname: 'urgent',
+			label: __('Urgent'),
+			fieldtype: 'Check',
+			change: function () {
+				me.load_data();
+			}
+		});
 	}
 
 	setup_refresh_button() {
@@ -91,7 +101,8 @@ class ProductionTimeline {
 			customer: this.page.fields_dict.customer.get_value(),
 			sales_order: this.page.fields_dict.sales_order.get_value(),
 			overall_status: this.page.fields_dict.overall_status.get_value(),
-			current_process: this.page.fields_dict.current_process.get_value()
+			current_process: this.page.fields_dict.current_process.get_value(),
+			urgent: this.page.fields_dict.urgent.get_value()
 		};
 	}
 

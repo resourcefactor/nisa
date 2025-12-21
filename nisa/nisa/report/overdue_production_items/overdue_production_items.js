@@ -36,10 +36,15 @@ frappe.query_reports["Overdue Production Items"] = {
 			"fieldname": "to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date"
+		},
+		{
+			"fieldname": "urgent",
+			"label": __("Urgent"),
+			"fieldtype": "Check"
 		}
 	],
 
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
 		if (column.fieldname == "days_overdue" && data && data.days_overdue > 0) {

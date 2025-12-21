@@ -36,10 +36,15 @@ frappe.query_reports["Partially Completed Orders"] = {
 			"fieldname": "to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date"
+		},
+		{
+			"fieldname": "urgent",
+			"label": __("Urgent"),
+			"fieldtype": "Check"
 		}
 	],
 
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
 		if (column.fieldname == "days_pending" && data && data.days_pending > 0) {

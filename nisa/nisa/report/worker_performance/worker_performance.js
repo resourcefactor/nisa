@@ -26,10 +26,15 @@ frappe.query_reports["Worker Performance"] = {
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today()
+		},
+		{
+			"fieldname": "urgent",
+			"label": __("Urgent"),
+			"fieldtype": "Check"
 		}
 	],
 
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
 		if (column.fieldname == "overdue" && data && data.overdue > 0) {

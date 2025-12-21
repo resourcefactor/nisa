@@ -130,4 +130,7 @@ def get_conditions(filters):
 	if filters.get("to_date"):
 		conditions.append("AND pit.assigned_date <= %(to_date)s")
 
+	if filters.get("urgent"):
+		conditions.append("AND pit.urgent = 1")
+
 	return " ".join(conditions)

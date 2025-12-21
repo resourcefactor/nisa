@@ -16,10 +16,13 @@ frappe.query_reports["Production Status"] = {
 			"default": frappe.datetime.add_days(frappe.datetime.get_today(), -30)
 		},
 		{
-			"fieldname": "to_date",
-			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today()
+		},
+		{
+			"fieldname": "urgent",
+			"label": __("Urgent"),
+			"fieldtype": "Check"
 		}
 	]
 };

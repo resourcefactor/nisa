@@ -41,6 +41,9 @@ def get_timeline_data(filters=None):
 		conditions.append('current_process = %(current_process)s')
 		values['current_process'] = filters['current_process']
 
+	if filters.get('urgent'):
+		conditions.append('urgent = 1')
+
 	where_clause = ' AND '.join(conditions) if conditions else '1=1'
 
 	# Get main items

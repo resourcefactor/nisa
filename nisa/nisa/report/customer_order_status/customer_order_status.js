@@ -26,14 +26,17 @@ frappe.query_reports["Customer Order Status"] = {
 			"fieldtype": "Date"
 		},
 		{
-			"fieldname": "order_status",
-			"label": __("Order Status"),
 			"fieldtype": "Select",
 			"options": "\nCompleted\nIn Progress\nOverdue\nNot Started"
+		},
+		{
+			"fieldname": "urgent",
+			"label": __("Urgent"),
+			"fieldtype": "Check"
 		}
 	],
 
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
 		if (column.fieldname == "overdue_items" && data && data.overdue_items > 0) {

@@ -233,3 +233,13 @@ scheduler_events = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": [
+            ["name", "in", ["Sales Order-custom_urgent"]]
+        ]
+    }
+]
+
+

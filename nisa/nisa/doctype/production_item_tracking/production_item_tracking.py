@@ -7,6 +7,10 @@ from frappe.utils import getdate, add_days, date_diff
 
 
 class ProductionItemTracking(Document):
+	def before_insert(self):
+		if not self.urgent and self.sales_order:
+			self.urgent = frappe.db.get_value("Sales Order", self.sales_order, "custom_urgent")
+
 	def onload(self):
 		"""Recalculate overdue status on document load for real-time accuracy"""
 		self.calculate_overdue_status()

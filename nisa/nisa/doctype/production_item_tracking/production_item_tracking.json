@@ -52,6 +52,13 @@
    "reqd": 1
   },
   {
+   "default": "0",
+   "fetch_from": "sales_order.custom_urgent",
+   "fieldname": "urgent",
+   "fieldtype": "Check",
+   "label": "Urgent"
+  },
+  {
    "fetch_from": "sales_order.customer",
    "fieldname": "customer",
    "fieldtype": "Link",

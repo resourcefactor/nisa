@@ -154,6 +154,14 @@ def get_conditions(filters):
 				)
 			""")
 
+	if filters.get("urgent"):
+		conditions.append("""
+			AND sales_order IN (
+				SELECT sales_order FROM `tabProduction Item Tracking`
+				WHERE urgent = 1
+			)
+		""")
+
 	return " ".join(conditions)
 
 
