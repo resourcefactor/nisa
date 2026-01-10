@@ -8,8 +8,7 @@ from frappe import _
 def execute(filters=None):
 	columns = get_columns()
 	data = get_data(filters)
-	chart = get_chart_data(data)
-	return columns, data, None, chart
+	return columns, data
 
 
 def get_columns():
@@ -33,6 +32,13 @@ def get_columns():
 			"label": _("Customer Name"),
 			"fieldtype": "Data",
 			"width": 180
+		},
+		{
+			"fieldname": "sales_person",
+			"label": _("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150
 		},
 		{
 			"fieldname": "delivery_date",
@@ -90,32 +96,38 @@ def get_data(filters):
 
 	data = frappe.db.sql("""
 		SELECT
-			sales_order,
-			customer,customer_name,
-			sales_order_delivery_date as delivery_date,
+			pit.sales_order,
+			pit.customer,
+			pit.customer_name,
+			pit.sales_order_delivery_date as delivery_date,
+			(SELECT st.sales_person
+			 FROM `tabSales Team` st
+			 WHERE st.parent = pit.sales_order
+			 AND st.parenttype = 'Sales Order'
+			 LIMIT 1) as sales_person,
 			COUNT(*) as total_items,
-			SUM(CASE WHEN overall_status = 'Completed' THEN 1 ELSE 0 END) as completed_items,
-			SUM(CASE WHEN overall_status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_items,
-			SUM(CASE WHEN overall_status = 'Not Started' THEN 1 ELSE 0 END) as not_started_items,
-			SUM(CASE WHEN is_overdue = 1 THEN 1 ELSE 0 END) as overdue_items,
-			(SUM(CASE WHEN overall_status = 'Completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as completion_percentage,
+			SUM(CASE WHEN pit.overall_status = 'Completed' THEN 1 ELSE 0 END) as completed_items,
+			SUM(CASE WHEN pit.overall_status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_items,
+			SUM(CASE WHEN pit.overall_status = 'Not Started' THEN 1 ELSE 0 END) as not_started_items,
+			SUM(CASE WHEN pit.is_overdue = 1 THEN 1 ELSE 0 END) as overdue_items,
+			(SUM(CASE WHEN pit.overall_status = 'Completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as completion_percentage,
 			CASE
-				WHEN SUM(CASE WHEN overall_status = 'Completed' THEN 1 ELSE 0 END) = COUNT(*) THEN 'Completed'
-				WHEN SUM(CASE WHEN is_overdue = 1 THEN 1 ELSE 0 END) > 0 THEN 'Overdue'
-				WHEN SUM(CASE WHEN overall_status = 'In Progress' THEN 1 ELSE 0 END) > 0 THEN 'In Progress'
+				WHEN SUM(CASE WHEN pit.overall_status = 'Completed' THEN 1 ELSE 0 END) = COUNT(*) THEN 'Completed'
+				WHEN SUM(CASE WHEN pit.is_overdue = 1 THEN 1 ELSE 0 END) > 0 THEN 'Overdue'
+				WHEN SUM(CASE WHEN pit.overall_status = 'In Progress' THEN 1 ELSE 0 END) > 0 THEN 'In Progress'
 				ELSE 'Not Started'
 			END as order_status
 		FROM
-			`tabProduction Item Tracking`
+			`tabProduction Item Tracking` pit
 		WHERE
 			1=1
 			{conditions}
 		GROUP BY
-			sales_order,
-			customer,
-			sales_order_delivery_date
+			pit.sales_order,
+			pit.customer,
+			pit.sales_order_delivery_date
 		ORDER BY
-			sales_order_delivery_date ASC,
+			pit.sales_order_delivery_date ASC,
 			completion_percentage ASC
 	""".format(conditions=conditions), filters, as_dict=1)
 
@@ -162,40 +174,13 @@ def get_conditions(filters):
 			)
 		""")
 
+	if filters.get("sales_person"):
+		conditions.append("""
+			AND sales_order IN (
+				SELECT parent FROM `tabSales Team`
+				WHERE parenttype = 'Sales Order'
+				AND sales_person = %(sales_person)s
+			)
+		""")
+
 	return " ".join(conditions)
-
-
-def get_chart_data(data):
-	if not data:
-		return None
-
-	# Create stacked bar chart showing order completion status
-	labels = [d.sales_order for d in data[:10]]  # Top 10 orders
-	completed = [d.completed_items for d in data[:10]]
-	in_progress = [d.in_progress_items for d in data[:10]]
-	not_started = [d.not_started_items for d in data[:10]]
-
-	return {
-		"data": {
-			"labels": labels,
-			"datasets": [
-				{
-					"name": "Completed",
-					"values": completed
-				},
-				{
-					"name": "In Progress",
-					"values": in_progress
-				},
-				{
-					"name": "Not Started",
-					"values": not_started
-				}
-			]
-		},
-		"type": "bar",
-		"colors": ["#28a745", "#007bff", "#6c757d"],
-		"barOptions": {
-			"stacked": True
-		}
-	}

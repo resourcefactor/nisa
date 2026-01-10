@@ -16,6 +16,12 @@ frappe.query_reports["Customer Order Status"] = {
 			"options": "Sales Order"
 		},
 		{
+			"fieldname": "sales_person",
+			"label": __("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person"
+		},
+		{
 			"fieldname": "from_date",
 			"label": __("From Delivery Date"),
 			"fieldtype": "Date"
@@ -26,6 +32,8 @@ frappe.query_reports["Customer Order Status"] = {
 			"fieldtype": "Date"
 		},
 		{
+			"fieldname": "order_status",
+			"label": __("Order Status"),
 			"fieldtype": "Select",
 			"options": "\nCompleted\nIn Progress\nOverdue\nNot Started"
 		},

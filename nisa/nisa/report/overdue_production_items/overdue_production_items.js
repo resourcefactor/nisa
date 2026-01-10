@@ -16,6 +16,12 @@ frappe.query_reports["Overdue Production Items"] = {
 			"options": "Sales Order"
 		},
 		{
+			"fieldname": "sales_person",
+			"label": __("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person"
+		},
+		{
 			"fieldname": "current_process",
 			"label": __("Current Process"),
 			"fieldtype": "Select",

@@ -41,6 +41,13 @@ def get_columns():
 			"width": 150
 		},
 		{
+			"fieldname": "sales_person",
+			"label": _("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150
+		},
+		{
 			"fieldname": "item_code",
 			"label": _("Item Code"),
 			"fieldtype": "Link",
@@ -107,26 +114,32 @@ def get_data(filters):
 	# Fetch data - note we're still selecting days_overdue for filtering, but will recalculate
 	data = frappe.db.sql("""
 		SELECT
-			name,
-			sales_order,
-			customer,customer_name,
-			item_code,
-			item_name,
-			current_process,
-			current_assignee,
-			assignee_name,
-			assigned_date,
-			expected_completion_date,
-			received_date,
-			sales_order_delivery_date
+			pit.name,
+			pit.sales_order,
+			pit.customer,
+			pit.customer_name,
+			(SELECT st.sales_person
+			 FROM `tabSales Team` st
+			 WHERE st.parent = pit.sales_order
+			 AND st.parenttype = 'Sales Order'
+			 LIMIT 1) as sales_person,
+			pit.item_code,
+			pit.item_name,
+			pit.current_process,
+			pit.current_assignee,
+			pit.assignee_name,
+			pit.assigned_date,
+			pit.expected_completion_date,
+			pit.received_date,
+			pit.sales_order_delivery_date
 		FROM
-			`tabProduction Item Tracking`
+			`tabProduction Item Tracking` pit
 		WHERE
-			actual_completion_date IS NULL
-			AND expected_completion_date IS NOT NULL
+			pit.actual_completion_date IS NULL
+			AND pit.expected_completion_date IS NOT NULL
 			{conditions}
 		ORDER BY
-			expected_completion_date ASC
+			pit.expected_completion_date ASC
 	""".format(conditions=conditions), filters, as_dict=1)
 	
 	# Calculate days_overdue dynamically for each row
@@ -174,5 +187,14 @@ def get_conditions(filters):
 
 	if filters.get("urgent"):
 		conditions.append("AND urgent = 1")
+
+	if filters.get("sales_person"):
+		conditions.append("""
+			AND sales_order IN (
+				SELECT parent FROM `tabSales Team`
+				WHERE parenttype = 'Sales Order'
+				AND sales_person = %(sales_person)s
+			)
+		""")
 
 	return " ".join(conditions)
