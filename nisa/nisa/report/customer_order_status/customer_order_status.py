@@ -138,21 +138,21 @@ def get_conditions(filters):
 	conditions = []
 
 	if filters.get("customer"):
-		conditions.append("AND customer = %(customer)s")
+		conditions.append("AND pit.customer = %(customer)s")
 
 	if filters.get("sales_order"):
-		conditions.append("AND sales_order = %(sales_order)s")
+		conditions.append("AND pit.sales_order = %(sales_order)s")
 
 	if filters.get("from_date"):
-		conditions.append("AND sales_order_delivery_date >= %(from_date)s")
+		conditions.append("AND pit.sales_order_delivery_date >= %(from_date)s")
 
 	if filters.get("to_date"):
-		conditions.append("AND sales_order_delivery_date <= %(to_date)s")
+		conditions.append("AND pit.sales_order_delivery_date <= %(to_date)s")
 
 	if filters.get("order_status"):
 		if filters.get("order_status") == "Completed":
 			conditions.append("""
-				AND sales_order IN (
+				AND pit.sales_order IN (
 					SELECT sales_order FROM `tabProduction Item Tracking`
 					GROUP BY sales_order
 					HAVING SUM(CASE WHEN overall_status = 'Completed' THEN 1 ELSE 0 END) = COUNT(*)
@@ -160,15 +160,29 @@ def get_conditions(filters):
 			""")
 		elif filters.get("order_status") == "Overdue":
 			conditions.append("""
-				AND sales_order IN (
+				AND pit.sales_order IN (
 					SELECT sales_order FROM `tabProduction Item Tracking`
 					WHERE is_overdue = 1
+				)
+			""")
+		elif filters.get("order_status") == "In Progress":
+			conditions.append("""
+				AND pit.sales_order IN (
+					SELECT sales_order FROM `tabProduction Item Tracking`
+					WHERE overall_status = 'In Progress'
+				)
+			""")
+		elif filters.get("order_status") == "Not Started":
+			conditions.append("""
+				AND pit.sales_order IN (
+					SELECT sales_order FROM `tabProduction Item Tracking`
+					WHERE overall_status = 'Not Started'
 				)
 			""")
 
 	if filters.get("urgent"):
 		conditions.append("""
-			AND sales_order IN (
+			AND pit.sales_order IN (
 				SELECT sales_order FROM `tabProduction Item Tracking`
 				WHERE urgent = 1
 			)
@@ -176,7 +190,7 @@ def get_conditions(filters):
 
 	if filters.get("sales_person"):
 		conditions.append("""
-			AND sales_order IN (
+			AND pit.sales_order IN (
 				SELECT parent FROM `tabSales Team`
 				WHERE parenttype = 'Sales Order'
 				AND sales_person = %(sales_person)s
