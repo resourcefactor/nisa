@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-13 20:01:54.276919",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enable",
+  "section_break_nkkw",
+  "url",
+  "media_url",
+  "id_instance",
+  "token",
+  "column_break_urus",
+  "register_device"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "depends_on": "enable",
+   "fieldname": "section_break_nkkw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "URL",
+   "mandatory_depends_on": "enable"
+  },
+  {
+   "fieldname": "media_url",
+   "fieldtype": "Data",
+   "label": "Media URL",
+   "mandatory_depends_on": "enable"
+  },
+  {
+   "fieldname": "id_instance",
+   "fieldtype": "Data",
+   "label": "Id Instance",
+   "mandatory_depends_on": "enable"
+  },
+  {
+   "fieldname": "token",
+   "fieldtype": "Small Text",
+   "label": "Token",
+   "mandatory_depends_on": "enable"
+  },
+  {
+   "fieldname": "column_break_urus",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "register_device",
+   "fieldtype": "Button",
+   "label": "Register Device"
+  }
+ ],
+ "grid_page_length": 50,
+ "hide_toolbar": 1,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-01-13 20:05:44.046716",
+ "modified_by": "Administrator",
+ "module": "Nisa",
+ "name": "WhatsApp Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
