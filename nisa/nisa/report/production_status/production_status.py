@@ -108,7 +108,7 @@ def get_data(filters):
 		LEFT JOIN
 			`tabSupplier` sup ON pit.current_assignee = sup.name
 		WHERE
-			pit.received_date is null and  1=1
+			1=1
 			{conditions}
 		ORDER BY
 			pit.sales_order,
@@ -132,5 +132,21 @@ def get_conditions(filters):
 
 	if filters.get("urgent"):
 		conditions.append("AND pit.urgent = 1")
+
+	if filters.get("sales_person"):
+		conditions.append("""
+			AND pit.sales_order IN (
+				SELECT parent FROM `tabSales Team`
+				WHERE parenttype = 'Sales Order'
+				AND sales_person = %(sales_person)s
+			)
+		""")
+
+	if filters.get("completion_status"):
+		if filters.get("completion_status") == "Not Completed":
+			conditions.append("AND pit.actual_completion_date IS NULL")
+		elif filters.get("completion_status") == "Completed":
+			conditions.append("AND pit.actual_completion_date IS NOT NULL")
+		# "All" option doesn't add any condition
 
 	return " ".join(conditions)
