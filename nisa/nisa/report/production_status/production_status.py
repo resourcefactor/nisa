@@ -126,8 +126,20 @@ def get_data(filters):
 
 	# Calculate in_stock status for each row
 	for row in data:
-		# In Stock = received_date exists AND no current_assignee AND no actual_completion_date
-		if row.get('received_date') and not row.get('current_assignee') and not row.get('actual_date'):
+		# In Stock = received_date exists AND (assigned_date <= received_date) AND no actual_completion_date
+		# This means item was received back but hasn't been assigned to next process yet
+		received_date = row.get('received_date')
+		assignment_date = row.get('assignment_date')
+		actual_date = row.get('actual_date')
+		
+		# Check if received_date exists (not None and not empty)
+		# AND assignment_date exists
+		# AND received_date >= assignment_date
+		# AND actual_date is empty (None or empty string)
+		if (received_date and received_date != '' and
+				assignment_date and assignment_date != '' and
+				received_date >= assignment_date and
+				not actual_date):
 			row['in_stock'] = 'Yes'
 		else:
 			row['in_stock'] = ''
@@ -167,7 +179,13 @@ def get_conditions(filters):
 		# "All" option doesn't add any condition
 
 	# Filter out Partially Completed items if checkbox is not checked
+	# Partially Completed = received_date exists but actual_completion_date does not exist
 	if not filters.get("show_partially_completed"):
-		conditions.append("AND pit.overall_status != 'Partially Completed'")
+		conditions.append("""
+			AND NOT (
+				(pit.received_date IS NOT NULL AND pit.received_date != '')
+				AND (pit.actual_completion_date IS NULL OR pit.actual_completion_date = '')
+			)
+		""")
 
 	return " ".join(conditions)
