@@ -83,6 +83,12 @@ def get_columns():
 			"label": _("Actual Date"),
 			"fieldtype": "Date",
 			"width": 120
+		},
+		{
+			"fieldname": "in_stock",
+			"label": _("In Stock"),
+			"fieldtype": "Data",
+			"width": 80
 		}
 	]
 
@@ -102,7 +108,10 @@ def get_data(filters):
 			pit.qty,
 			pit.assigned_date as assignment_date,
 			pit.expected_completion_date,
-			pit.actual_completion_date as actual_date
+			pit.actual_completion_date as actual_date,
+			pit.received_date,
+			pit.current_assignee,
+			pit.overall_status
 		FROM
 			`tabProduction Item Tracking` pit
 		LEFT JOIN
@@ -114,6 +123,14 @@ def get_data(filters):
 			pit.sales_order,
 			pit.assigned_date
 	""".format(conditions=conditions), filters, as_dict=1)
+
+	# Calculate in_stock status for each row
+	for row in data:
+		# In Stock = received_date exists AND no current_assignee AND no actual_completion_date
+		if row.get('received_date') and not row.get('current_assignee') and not row.get('actual_date'):
+			row['in_stock'] = 'Yes'
+		else:
+			row['in_stock'] = ''
 
 	return data
 
@@ -148,5 +165,9 @@ def get_conditions(filters):
 		elif filters.get("completion_status") == "Completed":
 			conditions.append("AND pit.actual_completion_date IS NOT NULL")
 		# "All" option doesn't add any condition
+
+	# Filter out Partially Completed items if checkbox is not checked
+	if not filters.get("show_partially_completed"):
+		conditions.append("AND pit.overall_status != 'Partially Completed'")
 
 	return " ".join(conditions)
