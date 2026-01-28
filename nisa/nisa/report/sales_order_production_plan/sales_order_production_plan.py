@@ -14,12 +14,31 @@ def get_columns():
 			"width": 150
 		},
 		{
-			"fieldname": "customer",
-			"label": "Customer",
-			"fieldtype": "Link",
-			"options": "Customer",
-			"width": 150
-		},
+		"fieldname": "customer",
+		"label": "Customer",
+		"fieldtype": "Link",
+		"options": "Customer",
+		"width": 150
+	},
+	{
+		"fieldname": "customer_name",
+		"label": "Customer Name",
+		"fieldtype": "Data",
+		"width": 150
+	},
+	{
+		"fieldname": "item_code",
+		"label": "Item Code",
+		"fieldtype": "Link",
+		"options": "Item",
+		"width": 150
+	},
+	{
+		"fieldname": "item_name",
+		"label": "Item Name",
+		"fieldtype": "Data",
+		"width": 200
+	},
 		{
 			"fieldname": "transaction_date",
 			"label": "Date",
@@ -62,15 +81,15 @@ def get_columns():
 def get_data(filters):
 	conditions = []
 	if filters.get("from_date"):
-		conditions.append("transaction_date >= %(from_date)s")
+		conditions.append("so.transaction_date >= %(from_date)s")
 	if filters.get("to_date"):
-		conditions.append("transaction_date <= %(to_date)s")
+		conditions.append("so.transaction_date <= %(to_date)s")
 	if filters.get("customer"):
-		conditions.append("customer = %(customer)s")
+		conditions.append("so.customer = %(customer)s")
 	if filters.get("status"):
-		conditions.append("status = %(status)s")
+		conditions.append("so.status = %(status)s")
 	if filters.get("custom_urgent"):
-		conditions.append("custom_urgent = 1")
+		conditions.append("so.custom_urgent = 1")
 
 	where_clause = " AND ".join(conditions)
 	if where_clause:
@@ -78,11 +97,25 @@ def get_data(filters):
 	
 	sql = f"""
 		SELECT
-			name, customer, transaction_date, delivery_date, status, custom_urgent, grand_total, terms
+			so.name,
+			so.customer,
+			c.customer_name,
+			soi.item_code,
+			soi.item_name,
+			so.transaction_date,
+			so.delivery_date,
+			so.status,
+			so.custom_urgent,
+			so.grand_total,
+			so.terms
 		FROM
-			`tabSales Order`
+			`tabSales Order` so
+		LEFT JOIN
+			`tabSales Order Item` soi ON soi.parent = so.name
+		LEFT JOIN
+			`tabCustomer` c ON c.name = so.customer
 		{where_clause}
-		ORDER BY transaction_date DESC
+		ORDER BY so.transaction_date DESC, so.name, soi.idx
 	"""
 	
 	data = frappe.db.sql(sql, filters, as_dict=True)
