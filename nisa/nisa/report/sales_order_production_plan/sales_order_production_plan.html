@@ -46,24 +46,36 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for (var i=0; i<data.length; i++) { %} <tr>
-				{% for (var j=0; j<columns.length; j++) { %} {% if (columns[j].fieldname !=="terms" ) { %} <td>{%=
+			{%
+			// Calculate visible columns count once
+			var visible_columns = 0;
+			for(var k=0; k<columns.length; k++) { if(columns[k].fieldname !=="terms" ) visible_columns++; } // Loop
+				through all data rows for (var i=0; i<data.length; i++) { var current_so=data[i].name; var
+				current_terms=data[i].terms; %} <tr>
+				{% for (var j=0; j<columns.length; j++) { if (columns[j].fieldname !=="terms" ) { %} <td>{%=
 					data[i][columns[j].fieldname] %}</td>
-					{% } %}
-					{% } %}
+					{% }
+					} %}
 					</tr>
-					{% if (data[i].terms) { %}
+					{%
+					// Check if next row is a different sales order or if this is the last row
+					var is_last_row = (i === data.length - 1);
+					var next_so_different = !is_last_row && (data[i + 1].name !== current_so);
+					var show_terms = is_last_row || next_so_different;
+
+					// Show terms row only when we've finished all items for current SO
+					if (show_terms && current_terms) {
+					%}
 					<tr class="terms-row">
-						{%
-						var visible_columns = 0;
-						for(var k=0; k<columns.length; k++) { if(columns[k].fieldname !=="terms" ) visible_columns++; }
-							%} <td colspan="{%= visible_columns %}">
-							<strong>Terms:</strong> :
-							{%= data[i].terms %}
-							</td>
+						<td colspan="{%= visible_columns %}">
+							<strong>Terms:</strong>
+							{%= current_terms %}
+						</td>
 					</tr>
-					{% } %}
-					{% } %}
+					{%
+					}
+					}
+					%}
 		</tbody>
 	</table>
 </div>
