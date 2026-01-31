@@ -1,8 +1,10 @@
 import frappe
 
+
 def execute(filters=None):
 	columns, data = get_columns(), get_data(filters)
 	return columns, data
+
 
 def get_columns():
 	return [
@@ -11,72 +13,38 @@ def get_columns():
 			"label": "Sales Order",
 			"fieldtype": "Link",
 			"options": "Sales Order",
-			"width": 150
+			"width": 150,
 		},
 		{
-		"fieldname": "customer",
-		"label": "Customer",
-		"fieldtype": "Link",
-		"options": "Customer",
-		"width": 150
-	},
-	{
-		"fieldname": "customer_name",
-		"label": "Customer Name",
-		"fieldtype": "Data",
-		"width": 150
-	},
-	{
-		"fieldname": "item_code",
-		"label": "Item Code",
-		"fieldtype": "Link",
-		"options": "Item",
-		"width": 150
-	},
-	{
-		"fieldname": "item_name",
-		"label": "Item Name",
-		"fieldtype": "Data",
-		"width": 200
-	},
-		{
-			"fieldname": "transaction_date",
-			"label": "Date",
-			"fieldtype": "Date",
-			"width": 100
+			"fieldname": "customer",
+			"label": "Customer",
+			"fieldtype": "Link",
+			"options": "Customer",
+			"width": 150,
 		},
+		{"fieldname": "customer_name", "label": "Customer Name", "fieldtype": "Data", "width": 150},
 		{
-			"fieldname": "delivery_date",
-			"label": "Delivery Date",
-			"fieldtype": "Date",
-			"width": 100
+			"fieldname": "item_code",
+			"label": "Item Code",
+			"fieldtype": "Link",
+			"options": "Item",
+			"width": 150,
 		},
-		{
-			"fieldname": "status",
-			"label": "Status",
-			"fieldtype": "Data",
-			"width": 100
-		},
-		{
-			"fieldname": "custom_urgent",
-			"label": "Urgent",
-			"fieldtype": "Check",
-			"width": 80
-		},
-		{
-			"fieldname": "grand_total",
-			"label": "Grand Total",
-			"fieldtype": "Currency",
-			"width": 120
-		},
+		{"fieldname": "item_name", "label": "Item Name", "fieldtype": "Data", "width": 200},
+		{"fieldname": "transaction_date", "label": "Date", "fieldtype": "Date", "width": 100},
+		{"fieldname": "delivery_date", "label": "Delivery Date", "fieldtype": "Date", "width": 100},
+		{"fieldname": "status", "label": "Status", "fieldtype": "Data", "width": 100},
+		{"fieldname": "custom_urgent", "label": "Urgent", "fieldtype": "Check", "width": 80},
+		{"fieldname": "amount", "label": "Amount", "fieldtype": "Currency", "width": 120},
 		{
 			"fieldname": "terms",
 			"label": "Terms",
 			"fieldtype": "Text Editor",
 			"width": 300,
-			"hidden": 0 # Visible in grid but will be special in Print
-		}
+			"hidden": 0,  # Visible in grid but will be special in Print
+		},
 	]
+
 
 def get_data(filters):
 	conditions = []
@@ -94,7 +62,7 @@ def get_data(filters):
 	where_clause = " AND ".join(conditions)
 	if where_clause:
 		where_clause = "WHERE " + where_clause
-	
+
 	sql = f"""
 		SELECT
 			so.name,
@@ -106,7 +74,7 @@ def get_data(filters):
 			so.delivery_date,
 			so.status,
 			so.custom_urgent,
-			so.grand_total,
+			soi.amount,
 			so.terms
 		FROM
 			`tabSales Order` so
@@ -117,6 +85,6 @@ def get_data(filters):
 		{where_clause}
 		ORDER BY so.transaction_date DESC, so.name, soi.idx
 	"""
-	
+
 	data = frappe.db.sql(sql, filters, as_dict=True)
 	return data
