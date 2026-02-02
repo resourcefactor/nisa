@@ -41,6 +41,13 @@ def get_columns():
 			"width": 150
 		},
 		{
+			"fieldname": "sales_person",
+			"label": _("Salesperson"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150
+		},
+		{
 			"fieldname": "item_code",
 			"label": _("Item Code"),
 			"fieldtype": "Link",
@@ -111,6 +118,14 @@ def get_data(filters):
 			sales_order,
 			customer,
 			customer_name,
+			(
+				SELECT st.sales_person
+				FROM `tabSales Team` st
+				WHERE st.parent = sales_order
+				AND st.parenttype = 'Sales Order'
+				ORDER BY st.idx
+				LIMIT 1
+			) as sales_person,
 			item_code,
 			item_name,
 			current_process,
@@ -166,5 +181,14 @@ def get_conditions(filters):
 
 	if filters.get("urgent"):
 		conditions.append("AND urgent = 1")
+
+	if filters.get("sales_person"):
+		conditions.append("""
+			AND sales_order IN (
+				SELECT parent FROM `tabSales Team`
+				WHERE parenttype = 'Sales Order'
+				AND sales_person = %(sales_person)s
+			)
+		""")
 
 	return " ".join(conditions)

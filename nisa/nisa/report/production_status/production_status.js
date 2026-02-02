@@ -11,7 +11,7 @@ frappe.query_reports["Production Status"] = {
 		},
 		{
 			"fieldname": "sales_person",
-			"label": __("Sales Person"),
+			"label": __("Salesperson"),
 			"fieldtype": "Link",
 			"options": "Sales Person"
 		},

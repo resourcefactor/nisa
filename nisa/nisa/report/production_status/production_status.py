@@ -31,10 +31,10 @@ def get_columns():
 		{
 			"fieldname": "supplier_name",
 			"label": _("Supplier Name"),
-			"fieldtype": "Data",				
+			"fieldtype": "Data",
 			"width": 180
 		},
-  {
+		{
 			"fieldname": "customer",
 			"label": _("Customer"),
 			"fieldtype": "Link",
@@ -44,8 +44,15 @@ def get_columns():
 		{
 			"fieldname": "customer_name",
 			"label": _("Customer Name"),
-			"fieldtype": "Data",				
+			"fieldtype": "Data",
 			"width": 180
+		},
+		{
+			"fieldname": "sales_person",
+			"label": _("Salesperson"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150
 		},
 		{
 			"fieldname": "item_code",
@@ -103,6 +110,14 @@ def get_data(filters):
 			pit.current_assignee as supplier_name,
 			pit.customer,
 			pit.customer_name,
+			(
+				SELECT st.sales_person
+				FROM `tabSales Team` st
+				WHERE st.parent = pit.sales_order
+				AND st.parenttype = 'Sales Order'
+				ORDER BY st.idx
+				LIMIT 1
+			) as sales_person,
 			pit.item_code,
 			pit.item_name,
 			pit.qty,

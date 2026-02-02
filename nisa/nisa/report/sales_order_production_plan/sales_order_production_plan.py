@@ -24,6 +24,13 @@ def get_columns():
 		},
 		{"fieldname": "customer_name", "label": "Customer Name", "fieldtype": "Data", "width": 150},
 		{
+			"fieldname": "sales_person",
+			"label": "Salesperson",
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150,
+		},
+		{
 			"fieldname": "item_code",
 			"label": "Item Code",
 			"fieldtype": "Link",
@@ -58,6 +65,14 @@ def get_data(filters):
 		conditions.append("so.status = %(status)s")
 	if filters.get("custom_urgent"):
 		conditions.append("so.custom_urgent = 1")
+	if filters.get("sales_person"):
+		conditions.append("""
+		so.name IN (
+			SELECT parent FROM `tabSales Team`
+			WHERE parenttype = 'Sales Order'
+			AND sales_person = %(sales_person)s
+		)
+		""")
 
 	where_clause = " AND ".join(conditions)
 	if where_clause:
@@ -68,6 +83,14 @@ def get_data(filters):
 			so.name,
 			so.customer,
 			c.customer_name,
+			(
+				SELECT st.sales_person
+				FROM `tabSales Team` st
+				WHERE st.parent = so.name
+				AND st.parenttype = 'Sales Order'
+				ORDER BY st.idx
+				LIMIT 1
+			) as sales_person,
 			soi.item_code,
 			soi.item_name,
 			so.transaction_date,
