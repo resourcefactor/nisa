@@ -16,20 +16,26 @@ def get_columns():
 			"width": 150,
 		},
 		{
+			"fieldname": "sales_person",
+			"label": "Sales Person",
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 130
+		},
+		{
 			"fieldname": "customer",
 			"label": "Customer",
 			"fieldtype": "Link",
 			"options": "Customer",
 			"width": 150,
 		},
-		{"fieldname": "customer_name", "label": "Customer Name", "fieldtype": "Data", "width": 150},
 		{
-			"fieldname": "sales_person",
-			"label": "Salesperson",
-			"fieldtype": "Link",
-			"options": "Sales Person",
+			"fieldname": "customer_name",
+			"label": "Customer Name",
+			"fieldtype": "Data",
 			"width": 150,
 		},
+
 		{
 			"fieldname": "item_code",
 			"label": "Item Code",
@@ -38,6 +44,7 @@ def get_columns():
 			"width": 150,
 		},
 		{"fieldname": "item_name", "label": "Item Name", "fieldtype": "Data", "width": 200},
+		{"fieldname": "qty", "label": "Qty", "fieldtype": "Float", "width": 80},
 		{"fieldname": "transaction_date", "label": "Date", "fieldtype": "Date", "width": 100},
 		{"fieldname": "delivery_date", "label": "Delivery Date", "fieldtype": "Date", "width": 100},
 		{"fieldname": "status", "label": "Status", "fieldtype": "Data", "width": 100},
@@ -65,14 +72,6 @@ def get_data(filters):
 		conditions.append("so.status = %(status)s")
 	if filters.get("custom_urgent"):
 		conditions.append("so.custom_urgent = 1")
-	if filters.get("sales_person"):
-		conditions.append("""
-		so.name IN (
-			SELECT parent FROM `tabSales Team`
-			WHERE parenttype = 'Sales Order'
-			AND sales_person = %(sales_person)s
-		)
-		""")
 
 	where_clause = " AND ".join(conditions)
 	if where_clause:
@@ -81,18 +80,13 @@ def get_data(filters):
 	sql = f"""
 		SELECT
 			so.name,
+			(SELECT sales_person FROM `tabSales Team` WHERE parent = so.name AND parenttype = 'Sales Order' LIMIT 1) as sales_person,
 			so.customer,
 			c.customer_name,
-			(
-				SELECT st.sales_person
-				FROM `tabSales Team` st
-				WHERE st.parent = so.name
-				AND st.parenttype = 'Sales Order'
-				ORDER BY st.idx
-				LIMIT 1
-			) as sales_person,
+
 			soi.item_code,
 			soi.item_name,
+			soi.qty,
 			so.transaction_date,
 			so.delivery_date,
 			so.status,

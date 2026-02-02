@@ -17,10 +17,11 @@ frappe.query_reports["Partially Completed Orders"] = {
 		},
 		{
 			"fieldname": "sales_person",
-			"label": __("Salesperson"),
+			"label": __("Sales Person"),
 			"fieldtype": "Link",
 			"options": "Sales Person"
 		},
+
 		{
 			"fieldname": "current_process",
 			"label": __("Current Process"),

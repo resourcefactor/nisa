@@ -22,6 +22,19 @@ def get_columns():
 			"width": 130
 		},
 		{
+			"fieldname": "sales_person",
+			"label": _("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 130
+		},
+		{
+			"fieldname": "delivery_date",
+			"label": _("Delivery Date"),
+			"fieldtype": "Date",
+			"width": 100
+		},
+		{
 			"fieldname": "supplier_code",
 			"label": _("Supplier Code"),
 			"fieldtype": "Link",
@@ -126,7 +139,9 @@ def get_data(filters):
 			pit.actual_completion_date as actual_date,
 			pit.received_date,
 			pit.current_assignee,
-			pit.overall_status
+			pit.overall_status,
+			(SELECT sales_person FROM `tabSales Team` WHERE parent = pit.sales_order AND parenttype = 'Sales Order' LIMIT 1) as sales_person,
+			(SELECT delivery_date FROM `tabSales Order` WHERE name = pit.sales_order) as delivery_date
 		FROM
 			`tabProduction Item Tracking` pit
 		LEFT JOIN

@@ -28,6 +28,13 @@ def get_columns():
 			"width": 130
 		},
 		{
+			"fieldname": "sales_person",
+			"label": _("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 130
+		},
+		{
 			"fieldname": "customer",
 			"label": _("Customer"),
 			"fieldtype": "Link",
@@ -40,13 +47,7 @@ def get_columns():
 			"fieldtype": "Data",
 			"width": 150
 		},
-		{
-			"fieldname": "sales_person",
-			"label": _("Salesperson"),
-			"fieldtype": "Link",
-			"options": "Sales Person",
-			"width": 150
-		},
+
 		{
 			"fieldname": "item_code",
 			"label": _("Item Code"),
@@ -116,16 +117,10 @@ def get_data(filters):
 		SELECT
 			name,
 			sales_order,
+			(SELECT sales_person FROM `tabSales Team` WHERE parent = sales_order AND parenttype = 'Sales Order' LIMIT 1) as sales_person,
 			customer,
 			customer_name,
-			(
-				SELECT st.sales_person
-				FROM `tabSales Team` st
-				WHERE st.parent = sales_order
-				AND st.parenttype = 'Sales Order'
-				ORDER BY st.idx
-				LIMIT 1
-			) as sales_person,
+
 			item_code,
 			item_name,
 			current_process,

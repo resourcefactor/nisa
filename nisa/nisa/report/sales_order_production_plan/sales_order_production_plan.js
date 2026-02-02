@@ -15,10 +15,23 @@ frappe.query_reports["Sales Order Production Plan"] = {
             "width": "80"
         },
         {
+            "fieldname": "sales_person",
+            "label": "Sales Person",
+            "fieldtype": "Link",
+            "options": "Sales Person",
+            "width": "80"
+        },
+        {
             "fieldname": "customer",
             "label": "Customer",
             "fieldtype": "Link",
             "options": "Customer",
+            "width": "60"
+        },
+        {
+            "fieldname": "customer_name",
+            "label": "Customer Name",
+            "fieldtype": "Data",
             "width": "80"
         },
         {

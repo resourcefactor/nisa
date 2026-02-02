@@ -40,7 +40,7 @@
 		<thead>
 			<tr>
 				{%
-				var skip_columns = ["customer", "transaction_date", "status", "terms"];
+				var skip_columns = ["name","customer","customer_name", "transaction_date", "status", "terms"];
 				for (var i=0; i<columns.length; i++) { if (skip_columns.indexOf(columns[i].fieldname)===-1) { %} <th
 					style="width: {%= columns[i].width %}px">{%= __(columns[i].label) %}</th>
 					{%
@@ -72,7 +72,7 @@
 					%}
 					<tr class="terms-row">
 						<td colspan="{%= visible_columns %}">
-							<strong>Terms:</strong>
+							<strong>Terms: SO : ({%= data[i].name %}) Customer : ({%= data[i].customer_name %})</strong>
 							{%= current_terms %}
 						</td>
 					</tr>
