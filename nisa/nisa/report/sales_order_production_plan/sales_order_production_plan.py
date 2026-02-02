@@ -72,6 +72,8 @@ def get_data(filters):
 		conditions.append("so.status = %(status)s")
 	if filters.get("custom_urgent"):
 		conditions.append("so.custom_urgent = 1")
+	if filters.get("sales_person"):
+		conditions.append("EXISTS (SELECT 1 FROM `tabSales Team` WHERE parent = so.name AND parenttype = 'Sales Order' AND sales_person = %(sales_person)s)")
 
 	where_clause = " AND ".join(conditions)
 	if where_clause:
