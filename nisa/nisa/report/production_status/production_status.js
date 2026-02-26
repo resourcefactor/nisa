@@ -19,7 +19,7 @@ frappe.query_reports["Production Status"] = {
 			"fieldname": "completion_status",
 			"label": __("Completion Status"),
 			"fieldtype": "Select",
-			"options": "Not Completed\nCompleted\nAll",
+			"options": "Not Completed\nNot Started\nIn Progress\nOverdue\nCompleted\nAll",
 			"default": "Not Completed"
 		},
 		{
@@ -58,6 +58,13 @@ frappe.query_reports["Production Status"] = {
 		// Highlight entire row if in_stock is "Yes"
 		if (data && data.in_stock === "Yes") {
 			var style = "background-color: #fffacd !important;"; // Light yellow
+			if (value.indexOf("style=") !== -1) {
+				value = value.replace(/style="/, 'style="' + style);
+			} else {
+				value = value.replace(/<td/, '<td style="' + style + '"');
+			}
+		} else if (data && data.overall_status === "Overdue") {
+			var style = "background-color: #ffe0e0 !important;"; // Light red
 			if (value.indexOf("style=") !== -1) {
 				value = value.replace(/style="/, 'style="' + style);
 			} else {

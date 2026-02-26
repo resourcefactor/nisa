@@ -114,6 +114,9 @@ def get_columns():
 
 
 def get_data(filters):
+	if filters.get("completion_status") == "Not Started":
+		return get_not_started_data(filters)
+
 	conditions = get_conditions(filters)
 
 	data = frappe.db.sql("""
@@ -177,6 +180,76 @@ def get_data(filters):
 	return data
 
 
+def get_not_started_data(filters):
+	# Part A: existing PIT records with no assignee yet
+	part_a = frappe.db.sql("""
+		SELECT
+			pit.sales_order,
+			sup.supplier_name as supplier_code,
+			pit.current_assignee as supplier_name,
+			pit.customer,
+			pit.customer_name,
+			(
+				SELECT st.sales_person FROM `tabSales Team` st
+				WHERE st.parent = pit.sales_order AND st.parenttype = 'Sales Order'
+				ORDER BY st.idx LIMIT 1
+			) as sales_person,
+			pit.item_code,
+			pit.item_name,
+			pit.qty,
+			pit.assigned_date as assignment_date,
+			pit.expected_completion_date,
+			pit.actual_completion_date as actual_date,
+			pit.received_date,
+			pit.current_assignee,
+			pit.overall_status,
+			(SELECT delivery_date FROM `tabSales Order` WHERE name = pit.sales_order) as delivery_date
+		FROM `tabProduction Item Tracking` pit
+		LEFT JOIN `tabSupplier` sup ON pit.current_assignee = sup.name
+		WHERE pit.overall_status = 'Not Started'
+		ORDER BY pit.sales_order, pit.assigned_date
+	""", as_dict=1)
+
+	# Part B: Sales Orders that have NO Production Item Tracking record at all
+	part_b = frappe.db.sql("""
+		SELECT
+			so.name as sales_order,
+			NULL as supplier_code,
+			NULL as supplier_name,
+			so.customer,
+			so.customer_name,
+			(
+				SELECT st.sales_person FROM `tabSales Team` st
+				WHERE st.parent = so.name AND st.parenttype = 'Sales Order'
+				ORDER BY st.idx LIMIT 1
+			) as sales_person,
+			soi.item_code,
+			soi.item_name,
+			soi.qty,
+			NULL as assignment_date,
+			NULL as expected_completion_date,
+			NULL as actual_date,
+			NULL as received_date,
+			NULL as current_assignee,
+			'Not Started' as overall_status,
+			so.delivery_date
+		FROM `tabSales Order` so
+		JOIN `tabSales Order Item` soi ON soi.parent = so.name AND soi.parenttype = 'Sales Order'
+		WHERE so.docstatus = 1
+		AND NOT EXISTS (
+			SELECT 1 FROM `tabProduction Item Tracking` pit
+			WHERE pit.sales_order = so.name
+		)
+		ORDER BY so.name
+	""", as_dict=1)
+
+	data = list(part_a) + list(part_b)
+	for row in data:
+		row['in_stock'] = ''
+
+	return data
+
+
 def get_conditions(filters):
 	conditions = []
 
@@ -202,7 +275,13 @@ def get_conditions(filters):
 		""")
 
 	if filters.get("completion_status"):
-		if filters.get("completion_status") == "Not Completed":
+		if filters.get("completion_status") == "Not Started":
+			conditions.append("AND pit.overall_status = 'Not Started'")
+		elif filters.get("completion_status") == "In Progress":
+			conditions.append("AND pit.overall_status = 'In Progress'")
+		elif filters.get("completion_status") == "Overdue":
+			conditions.append("AND pit.overall_status = 'Overdue'")
+		elif filters.get("completion_status") == "Not Completed":
 			conditions.append("AND pit.actual_completion_date IS NULL")
 		elif filters.get("completion_status") == "Completed":
 			conditions.append("AND pit.actual_completion_date IS NOT NULL")
