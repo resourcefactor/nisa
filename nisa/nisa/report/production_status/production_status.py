@@ -28,6 +28,12 @@ def get_columns():
 			"width": 100
 		},
 		{
+			"fieldname": "supplier_name",
+			"label": _("Supplier Name"),
+			"fieldtype": "Data",
+			"width": 180
+		},
+		{
 			"fieldname": "supplier_code",
 			"label": _("Supplier Code"),
 			"fieldtype": "Link",
@@ -35,10 +41,11 @@ def get_columns():
 			"width": 100
 		},
 		{
-			"fieldname": "supplier_name",
-			"label": _("Supplier Name"),
-			"fieldtype": "Data",
-			"width": 180
+			"fieldname": "sales_person",
+			"label": _("Sales Person"),
+			"fieldtype": "Link",
+			"options": "Sales Person",
+			"width": 150
 		},
 		{
 			"fieldname": "customer",
@@ -108,8 +115,8 @@ def get_data(filters):
 	data = frappe.db.sql("""
 		SELECT
 			pit.sales_order,
-			sup.supplier_name as supplier_code,
-			pit.current_assignee as supplier_name,
+			sup.supplier_name as supplier_name,
+			pit.current_assignee as supplier_code,
 			pit.customer,
 			pit.customer_name,
 			(
@@ -208,8 +215,8 @@ def get_not_started_data(filters):
 	part_a = frappe.db.sql("""
 		SELECT
 			pit.sales_order,
-			sup.supplier_name as supplier_code,
-			pit.current_assignee as supplier_name,
+			sup.supplier_name as supplier_name,
+			pit.current_assignee as supplier_code,
 			pit.customer,
 			pit.customer_name,
 			(
