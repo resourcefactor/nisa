@@ -130,31 +130,29 @@ app_license = "mit"
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Notification": "nisa.hook.notification.OvrNotification",
+    "Notification": "nisa.hook.notification.OvrNotification",
 }
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Sales Order": {
+        "validate": "nisa.nisa.sales_order.validate",
+    }
+}
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-	"cron": {
-		# Run daily at 1:00 AM to update overdue status for all Production Item Tracking records
-		"0 1 * * *": [
-			"nisa.nisa.doctype.production_item_tracking.production_item_tracking.update_all_overdue_status"
-		]
-	}
+    "cron": {
+        # Run daily at 1:00 AM to update overdue status
+        "0 1 * * *": [
+            "nisa.nisa.doctype.production_item_tracking.production_item_tracking.update_all_overdue_status"
+        ]
+    }
 }
 
 # Testing
@@ -237,9 +235,17 @@ fixtures = [
     {
         "dt": "Custom Field",
         "filters": [
-            ["name", "in", ["Sales Order-custom_urgent"]]
-        ]
+            [
+                "name",
+                "in",
+                [
+                    "Sales Order-custom_urgent",
+                    "Sales Order Item-custom_top",
+                    "Sales Order Item-custom_top_article",
+                    "Sales Order Item-custom_bottom",
+                    "Sales Order Item-custom_bottom_article",
+                ],
+            ]
+        ],
     }
 ]
-
-
