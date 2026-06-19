@@ -1,0 +1,6 @@
+[data-fieldname="custom_top_article_image"] img,
+[data-fieldname="custom_bottom_article_image"] img {
+	max-width: 200px;
+	max-height: 200px;
+	object-fit: contain;
+}
