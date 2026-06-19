@@ -46,7 +46,7 @@ app_license = "mit"
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
-# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+doctype_calendar_js = {"Sales Order": "public/js/sales_order_calendar.js"}
 
 # Svg Icons
 # ------------------
@@ -235,17 +235,7 @@ fixtures = [
     {
         "dt": "Custom Field",
         "filters": [
-            [
-                "name",
-                "in",
-                [
-                    "Sales Order-custom_urgent",
-                    "Sales Order Item-custom_top",
-                    "Sales Order Item-custom_top_article",
-                    "Sales Order Item-custom_bottom",
-                    "Sales Order Item-custom_bottom_article",
-                ],
-            ]
+            ["dt", "in", ["Sales Order", "Sales Order Item"]],
         ],
     }
 ]

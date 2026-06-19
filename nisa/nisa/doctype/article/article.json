@@ -5,10 +5,12 @@
  "creation": "2026-05-22 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
+ "image_field": "image",
  "field_order": [
   "article_name",
   "top",
-  "bottom"
+  "bottom",
+  "image"
  ],
  "fields": [
   {
@@ -34,6 +36,11 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Bottom"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
   }
  ],
  "links": [],

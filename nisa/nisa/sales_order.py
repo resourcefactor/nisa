@@ -3,6 +3,16 @@ from frappe import _
 from frappe.utils import getdate, add_days, today
 
 
+@frappe.whitelist()
+def get_events(start, end, filters=None):
+	from erpnext.selling.doctype.sales_order.sales_order import get_events as erpnext_get_events
+
+	data = erpnext_get_events(start, end, filters)
+	for d in data:
+		d["custom_calendar_title"] = f"{d.name} - {d.customer_name}"
+	return data
+
+
 def validate(doc, method=None):
 	_validate_delivery_date(doc)
 	_validate_max_deliveries_per_date(doc)
