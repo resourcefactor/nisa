@@ -56,8 +56,39 @@ frappe.views.CalendarView = class NisaSalesOrderCalendarView extends frappe.view
 		}
 
 		const view = fc.fullCalendar("getView");
-		const start = view.start.clone();
-		const end = view.end.clone();
+
+		// Collect the active filters from the filter bar.
+		const filters = (this.filter_area && this.filter_area.get()) || [];
+
+		// Default: print the currently visible month.
+		// If a "Between" filter on delivery_date is active, print the full
+		// filter date range so the user gets all selected months.
+		let start = view.start.clone();
+		let end = view.end.clone();
+		let printTitle = view.title;
+		for (const f of filters) {
+			// Filter format: [doctype, fieldname, operator, value]
+			if (f.length >= 4) {
+				const [, field, op, val] = f;
+				if (
+					field === "delivery_date" &&
+					op &&
+					op.toLowerCase() === "between" &&
+					Array.isArray(val) &&
+					val.length === 2
+				) {
+					start = moment(val[0]);
+					end = moment(val[1]).add(1, "day");
+					const s = moment(val[0]);
+					const e = moment(val[1]);
+					printTitle =
+						s.year() === e.year()
+							? `${s.format("MMMM")} – ${e.format("MMMM YYYY")}`
+							: `${s.format("MMMM YYYY")} – ${e.format("MMMM YYYY")}`;
+					break;
+				}
+			}
+		}
 
 		// Open the window synchronously (within the click handler) so popup
 		// blockers don't reject it — it gets filled in once data arrives.
@@ -70,9 +101,10 @@ frappe.views.CalendarView = class NisaSalesOrderCalendarView extends frappe.view
 			args: {
 				start: start.format("YYYY-MM-DD"),
 				end: end.format("YYYY-MM-DD"),
+				filters: filters,
 			},
 			callback: (r) => {
-				this.write_print_window(win, view.title, start, end, r.message || []);
+				this.write_print_window(win, printTitle, start, end, r.message || []);
 			},
 		});
 	}
@@ -86,20 +118,42 @@ frappe.views.CalendarView = class NisaSalesOrderCalendarView extends frappe.view
 		});
 
 		const week_days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-		let rows = "";
-		const day = start.clone();
-		while (day.isBefore(end)) {
-			rows += "<tr>";
-			for (let i = 0; i < 7; i++) {
-				const date_str = day.format("YYYY-MM-DD");
-				const titles = events_by_date[date_str] || [];
-				const items = titles
-					.map((t) => `<div class="event">${frappe.utils.escape_html(t)}</div>`)
-					.join("");
-				rows += `<td><div class="date-num">${day.date()}</div>${items}</td>`;
-				day.add(1, "day");
+
+		// Generate one calendar grid per month in the range.
+		let months_html = "";
+		const month_cursor = start.clone().startOf("month");
+		while (month_cursor.isBefore(end)) {
+			const month_label = month_cursor.format("MMMM YYYY");
+			const grid_start = month_cursor.clone().startOf("week");
+			const grid_end = month_cursor.clone().endOf("month").endOf("week").add(1, "day");
+
+			let rows = "";
+			const day = grid_start.clone();
+			while (day.isBefore(grid_end)) {
+				rows += "<tr>";
+				for (let i = 0; i < 7; i++) {
+					const date_str = day.format("YYYY-MM-DD");
+					const titles = events_by_date[date_str] || [];
+					const items = titles
+						.map((t) => `<div class="event">${frappe.utils.escape_html(t)}</div>`)
+						.join("");
+					const other = !day.isSame(month_cursor, "month");
+					rows += `<td${other ? ' class="other-month"' : ""}><div class="date-num">${day.date()}</div>${items}</td>`;
+					day.add(1, "day");
+				}
+				rows += "</tr>";
 			}
-			rows += "</tr>";
+
+			months_html += `
+				<div class="month-block">
+					<h2>${frappe.utils.escape_html(month_label)}</h2>
+					<table>
+						<thead><tr>${week_days.map((d) => `<th>${d}</th>`).join("")}</tr></thead>
+						<tbody>${rows}</tbody>
+					</table>
+				</div>`;
+
+			month_cursor.add(1, "month");
 		}
 
 		const html = `
@@ -108,8 +162,10 @@ frappe.views.CalendarView = class NisaSalesOrderCalendarView extends frappe.view
 				<title>${frappe.utils.escape_html(title)}</title>
 				<style>
 					body { font-family: sans-serif; margin: 20px; }
-					h2 { text-align: center; }
-					table { width: 100%; border-collapse: collapse; }
+					h2 { text-align: center; margin-top: 0; }
+					.month-block { page-break-after: always; }
+					.month-block:last-child { page-break-after: auto; }
+					table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
 					th, td {
 						border: 1px solid #ccc;
 						vertical-align: top;
@@ -119,15 +175,13 @@ frappe.views.CalendarView = class NisaSalesOrderCalendarView extends frappe.view
 					th { background: #f5f5f5; text-align: center; }
 					.date-num { font-weight: bold; margin-bottom: 4px; }
 					.event { font-size: 11px; color: #c0392b; margin-bottom: 2px; }
+					.other-month { background: #f9f9f9; }
+					.other-month .date-num { color: #bbb; }
 					tr { page-break-inside: avoid; }
 				</style>
 			</head>
 			<body>
-				<h2>${frappe.utils.escape_html(title)}</h2>
-				<table>
-					<thead><tr>${week_days.map((d) => `<th>${d}</th>`).join("")}</tr></thead>
-					<tbody>${rows}</tbody>
-				</table>
+				${months_html}
 			</body>
 			</html>
 		`;
