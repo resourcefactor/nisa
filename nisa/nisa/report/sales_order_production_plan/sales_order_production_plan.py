@@ -9,6 +9,12 @@ def execute(filters=None):
 def get_columns():
 	return [
 		{
+			"fieldname": "image",
+			"label": "Image",
+			"fieldtype": "Image",
+			"width": 80,
+		},
+		{
 			"fieldname": "name",
 			"label": "Sales Order",
 			"fieldtype": "Link",
@@ -94,13 +100,16 @@ def get_data(filters):
 			so.status,
 			so.custom_urgent,
 			soi.amount,
-			so.terms
+			so.terms,
+			COALESCE(soi.custom_top_article_image, soi.custom_bottom_article_image, i.image) as image
 		FROM
 			`tabSales Order` so
 		LEFT JOIN
 			`tabSales Order Item` soi ON soi.parent = so.name
 		LEFT JOIN
 			`tabCustomer` c ON c.name = so.customer
+		LEFT JOIN
+			`tabItem` i ON i.name = soi.item_code
 		{where_clause}
 		ORDER BY so.transaction_date DESC, so.name, soi.idx
 	"""

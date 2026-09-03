@@ -2,11 +2,21 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import getdate, add_days, date_diff
 
 
 class ProductionItemTracking(Document):
+	def validate(self):
+		if not self.in_house and not self.sales_order:
+			frappe.throw(_("Sales Order is mandatory unless In-House is checked."))
+		if self.in_house and not self.sales_order:
+			# Clear SO-linked fields so there are no orphan references
+			self.customer = self.customer or None
+			self.customer_name = self.customer_name or None
+			self.sales_order_delivery_date = None
+
 	def before_insert(self):
 		if not self.urgent and self.sales_order:
 			self.urgent = frappe.db.get_value("Sales Order", self.sales_order, "custom_urgent")

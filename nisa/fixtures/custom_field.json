@@ -733,5 +733,47 @@
   "unique": 0,
   "precision": "2",
   "non_negative": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "Sales Order",
+  "fieldname": "custom_ready_to_dispatch",
+  "fieldtype": "Check",
+  "label": "Ready to Dispatch",
+  "insert_after": "custom_urgent",
+  "default": "0",
+  "allow_on_submit": 1,
+  "in_list_view": 0,
+  "bold": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "Sales Order",
+  "fieldname": "custom_shade_section",
+  "fieldtype": "Section Break",
+  "label": "Shade",
+  "insert_after": "custom_ready_to_dispatch",
+  "collapsible": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "Sales Order",
+  "fieldname": "custom_shade_code",
+  "fieldtype": "Link",
+  "label": "Shade Code",
+  "options": "Shades",
+  "insert_after": "custom_shade_section",
+  "in_list_view": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "dt": "Sales Order",
+  "fieldname": "custom_shade_picture",
+  "fieldtype": "Attach Image",
+  "label": "Shade Picture",
+  "insert_after": "custom_shade_code",
+  "fetch_from": "custom_shade_code.picture",
+  "fetch_if_empty": 0,
+  "read_only": 1
  }
 ]

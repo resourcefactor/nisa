@@ -11,9 +11,18 @@ frappe.ui.form.on('Production Item Tracking', {
 				}
 			};
 		});
+		set_sales_order_mandatory(frm);
+	},
+
+	in_house: function (frm) {
+		set_sales_order_mandatory(frm);
+		if (frm.doc.in_house) {
+			frm.set_value('sales_order', null);
+		}
 	},
 
 	refresh: function (frm) {
+		set_sales_order_mandatory(frm);
 		// Recalculate overdue status on client side for real-time display
 		if (frm.doc.expected_completion_date && !frm.doc.actual_completion_date) {
 			let today = frappe.datetime.get_today();
@@ -302,6 +311,10 @@ function set_field_colors(frm) {
 	} else if (frm.doc.overall_status === 'In Progress') {
 		frm.fields_dict.overall_status.$wrapper.find('.control-value').css('color', 'blue');
 	}
+}
+
+function set_sales_order_mandatory(frm) {
+	frm.set_df_property('sales_order', 'reqd', frm.doc.in_house ? 0 : 1);
 }
 
 function show_item_selector(frm) {

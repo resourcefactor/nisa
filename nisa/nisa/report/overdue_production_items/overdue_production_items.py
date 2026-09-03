@@ -14,6 +14,12 @@ def execute(filters=None):
 def get_columns():
 	return [
 		{
+			"fieldname": "image",
+			"label": _("Image"),
+			"fieldtype": "Image",
+			"width": 80,
+		},
+		{
 			"fieldname": "name",
 			"label": _("ID"),
 			"fieldtype": "Link",
@@ -131,7 +137,18 @@ def get_data(filters):
 			pit.assigned_date,
 			pit.expected_completion_date,
 			pit.received_date,
-			pit.sales_order_delivery_date
+			pit.sales_order_delivery_date,
+			COALESCE(
+				(SELECT soi.custom_top_article_image
+				 FROM `tabSales Order Item` soi
+				 WHERE soi.parent = pit.sales_order AND soi.item_code = pit.item_code
+				 LIMIT 1),
+				(SELECT soi.custom_bottom_article_image
+				 FROM `tabSales Order Item` soi
+				 WHERE soi.parent = pit.sales_order AND soi.item_code = pit.item_code
+				 LIMIT 1),
+				(SELECT i.image FROM `tabItem` i WHERE i.name = pit.item_code)
+			) as image
 		FROM
 			`tabProduction Item Tracking` pit
 		WHERE

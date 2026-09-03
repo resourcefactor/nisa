@@ -1,12 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:PIT-{sales_order}-{item_code}-{####}",
+ "autoname": "naming_series:",
  "creation": "2025-11-12 20:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "sales_order_section",
+  "in_house",
   "sales_order",
   "customer",
   "column_break_sales",
@@ -43,13 +44,19 @@
    "label": "Sales Order Information"
   },
   {
+   "default": "0",
+   "fieldname": "in_house",
+   "fieldtype": "Check",
+   "label": "In-House"
+  },
+  {
    "fieldname": "sales_order",
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Sales Order",
    "options": "Sales Order",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "default": "0",
@@ -271,5 +278,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 1
+ "track_changes": 1,
+ "naming_series": "PIT-.####"
 }

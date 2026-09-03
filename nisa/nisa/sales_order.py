@@ -66,6 +66,7 @@ def get_events(start, end, filters=None):
 def validate(doc, method=None):
 	_validate_delivery_date(doc)
 	_validate_max_deliveries_per_date(doc)
+	_link_inhouse_production_items(doc)
 
 
 def _validate_delivery_date(doc):
@@ -87,6 +88,10 @@ def _validate_max_deliveries_per_date(doc):
 	if not doc.delivery_date:
 		return
 
+	# Ready-to-dispatch orders bypass the 5-per-day limit
+	if doc.get("custom_ready_to_dispatch"):
+		return
+
 	count = frappe.db.count(
 		"Sales Order",
 		filters={
@@ -103,3 +108,25 @@ def _validate_max_deliveries_per_date(doc):
 				frappe.format(doc.delivery_date, {"fieldtype": "Date"})
 			)
 		)
+
+
+def _link_inhouse_production_items(doc):
+	"""When a SO is saved, find in-house PIT records with matching item codes
+	that have no sales order yet, and link them to this SO."""
+	item_codes = list({row.item_code for row in doc.items if row.item_code})
+	if not item_codes:
+		return
+
+	for item_code in item_codes:
+		pit_records = frappe.get_all(
+			"Production Item Tracking",
+			filters={
+				"in_house": 1,
+				"item_code": item_code,
+				"sales_order": ["is", "not set"],
+			},
+			fields=["name"],
+			limit=1,
+		)
+		for pit in pit_records:
+			frappe.db.set_value("Production Item Tracking", pit.name, "sales_order", doc.name, update_modified=False)

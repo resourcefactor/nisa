@@ -46,6 +46,7 @@ app_include_css = "/assets/nisa/css/nisa.css"
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
+doctype_js = {"Sales Order": "public/js/sales_order.js"}
 doctype_calendar_js = {"Sales Order": "public/js/sales_order_calendar.js"}
 
 # Svg Icons
@@ -237,5 +238,6 @@ fixtures = [
         "filters": [
             ["dt", "in", ["Sales Order", "Sales Order Item"]],
         ],
-    }
+    },
+    {"dt": "Shades"},
 ]
