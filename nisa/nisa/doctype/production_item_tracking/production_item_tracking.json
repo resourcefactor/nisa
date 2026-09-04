@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "method:nisa.nisa.doctype.production_item_tracking.production_item_tracking.autoname_doc",
+ "autoname": "format:PIT-{sales_order}-{item_code}-{####}",
  "creation": "2025-11-12 20:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
