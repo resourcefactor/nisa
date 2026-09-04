@@ -36,14 +36,46 @@ def get_events(start, end, filters=None):
 				start, end = str(effective_start), str(effective_end)
 			break
 
-	conditions = get_event_conditions("Sales Order", filters)
+	# Sales Team filters (e.g. sales_person) can't be handled by get_event_conditions
+	# because tabSales Team is not in the FROM clause. Extract them and build EXISTS
+	# subqueries manually to avoid "Unknown column" SQL errors.
+	sales_team_filters = []
+	so_filters = []
+	for f in filters:
+		doctype = f[0] if len(f) >= 4 else None
+		if doctype == "Sales Team":
+			sales_team_filters.append(f)
+		else:
+			so_filters.append(f)
+
+	conditions = get_event_conditions("Sales Order", so_filters)
+
+	extra_conditions = ""
+	params = {"start": start, "end": end}
+	for idx, f in enumerate(sales_team_filters):
+		_, field, op, val = f[0], f[1], f[2], f[3]
+		param_key = f"st_val_{idx}"
+		if op == "=":
+			params[param_key] = val
+			extra_conditions += f"""
+				AND EXISTS (
+					SELECT 1 FROM `tabSales Team`
+					WHERE `tabSales Team`.parent = `tabSales Order`.name
+					AND `tabSales Team`.parenttype = 'Sales Order'
+					AND `tabSales Team`.`{field}` = %({param_key})s
+				)"""
 
 	data = frappe.db.sql(
 		f"""
 		select
 			distinct `tabSales Order`.name, `tabSales Order`.customer_name, `tabSales Order`.status,
 			`tabSales Order`.delivery_status, `tabSales Order`.billing_status,
-			`tabSales Order Item`.delivery_date
+			`tabSales Order Item`.delivery_date,
+			(select `tabSales Team`.sales_person
+			 from `tabSales Team`
+			 where `tabSales Team`.parent = `tabSales Order`.name
+			   and `tabSales Team`.parenttype = 'Sales Order'
+			 limit 1) as sales_person
 		from
 			`tabSales Order`, `tabSales Order Item`
 		where `tabSales Order`.name = `tabSales Order Item`.parent
@@ -52,14 +84,18 @@ def get_events(start, end, filters=None):
 			and (`tabSales Order Item`.delivery_date between %(start)s and %(end)s)
 			and `tabSales Order`.docstatus < 2
 			{conditions}
+			{extra_conditions}
 		""",
-		{"start": start, "end": end},
+		params,
 		as_dict=True,
 		update={"allDay": 0, "convertToUserTz": 0},
 	)
 
 	for d in data:
-		d["custom_calendar_title"] = f"{d.name} - {d.customer_name}"
+		parts = [d.name, d.customer_name]
+		if d.get("sales_person"):
+			parts.append(d.sales_person)
+		d["custom_calendar_title"] = " - ".join(parts)
 	return data
 
 
