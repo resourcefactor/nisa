@@ -238,6 +238,5 @@ fixtures = [
         "filters": [
             ["dt", "in", ["Sales Order", "Sales Order Item"]],
         ],
-    },
-    {"dt": "Shades"},
+    }
 ]
