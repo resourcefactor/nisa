@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "method:nisa.nisa.doctype.production_item_tracking.production_item_tracking.autoname_doc",
  "creation": "2025-11-12 20:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -278,6 +278,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 1,
- "naming_series": "PIT-.####"
+ "track_changes": 1
 }

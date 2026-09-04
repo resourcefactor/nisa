@@ -4,7 +4,17 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.model.naming import make_autoname
 from frappe.utils import getdate, add_days, date_diff
+
+
+def autoname_doc(doc, method=None):
+    if doc.sales_order and doc.item_code:
+        doc.name = make_autoname(f"PIT-{doc.sales_order}-{doc.item_code}-.####")
+    elif doc.item_code:
+        doc.name = make_autoname(f"PIT-IH-{doc.item_code}-.####")
+    else:
+        doc.name = make_autoname("PIT-IH-.####")
 
 
 class ProductionItemTracking(Document):
